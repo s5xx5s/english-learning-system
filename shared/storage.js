@@ -9,6 +9,7 @@
   const STATUS = { COMPLETED: 'completed', CURRENT: 'current', UNTOUCHED: 'untouched' };
   const AUTOSAVE_INTERVAL_MS = 30000;
   const FIELDS = [
+    /* legacy / lesson-engine fields */
     'completed_sections',
     'mcq_answers',
     'fillblank_answers',
@@ -16,7 +17,32 @@
     'chatgpt_json',
     'pronunciation',
     'timer_state',
-    'last_saved'
+    'last_saved',
+
+    /* day-type toggle (regular | writing | reflection) */
+    'day_type',
+
+    /* reading extras */
+    'story_hard_spelling',
+
+    /* actual minutes spent */
+    'actual_car_minutes',
+    'actual_home_minutes',
+
+    /* self-rating sliders 1-10 */
+    'rating_difficulty',
+    'rating_productivity',
+    'rating_confidence',
+
+    /* writing-only fields (day-type = writing) */
+    'workshop_topic',
+    'workshop_exercise',
+    'weekly_project_topic',
+    'weekly_project_text',
+    'self_edit_spelling',
+    'self_edit_grammar',
+    'self_edit_punctuation',
+    'total_errors_before'
   ];
 
   let autosaveTimerId = null;

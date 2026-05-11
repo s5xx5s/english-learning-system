@@ -6,6 +6,12 @@ title: ""
 goal: ""
 duration_minutes: 150
 
+# Day type: controls which sections show in the lesson page.
+#   regular    = days 1-5 (default)
+#   writing    = day 6: shows Writing Workshop + Weekly Project + Self-Edit
+#   reflection = day 7: hides Grammar + Spelling sections
+day_type: "regular"
+
 # Section timers (minutes)
 timers:
   podcast: 40

@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="../../shared/styles.css">
 </head>
 
-<body>
+<body class="day-type-{{DAY_TYPE}}" data-week="{{WEEK_NUMBER}}" data-day="{{DAY_NUMBER}}">
 
   <header class="header" role="banner">
     <div class="container header-inner">
@@ -45,7 +45,19 @@
     <section class="section" aria-labelledby="lesson-title">
       <h1 id="lesson-title" style="margin-bottom:8px">{{TITLE}}</h1>
       <p style="margin-bottom:8px"><strong>الهدف:</strong> {{GOAL}}</p>
-      <p class="text-muted">{{DATE}} · {{DURATION_MINUTES}} دقيقة</p>
+      <p class="text-muted" style="margin-bottom:16px">{{DATE}} · {{DURATION_MINUTES}} دقيقة</p>
+
+      <div class="day-type-toggle" role="radiogroup" aria-label="نوع اليوم">
+        <button type="button" class="day-type-btn" data-day-type="regular" role="radio">
+          عادي (1-5)
+        </button>
+        <button type="button" class="day-type-btn" data-day-type="writing" role="radio">
+          يوم 6 — Writing Workshop
+        </button>
+        <button type="button" class="day-type-btn" data-day-type="reflection" role="radio">
+          يوم 7 — تأمّل
+        </button>
+      </div>
     </section>
 
     <section class="section" data-section="WHY" aria-labelledby="sec-why">
@@ -142,6 +154,15 @@
       <div class="section-body">
         {{READING_SECTION}}
       </div>
+      <div class="reading-extras" style="margin-top:16px">
+        <label for="storyHardSpelling" style="display:block;margin-bottom:8px;font-weight:500">
+          3 كلمات بإملاء صعب من القصّة
+        </label>
+        <textarea id="storyHardSpelling"
+                  data-field="story_hard_spelling"
+                  rows="3"
+                  placeholder="مثال: receive, separate, accommodate"></textarea>
+      </div>
     </section>
 
     <section class="section" data-section="PRONUNCIATION" aria-labelledby="sec-pronunciation">
@@ -202,6 +223,63 @@
       </div>
     </section>
 
+    <section class="section writing-only" data-section="WORKSHOP" aria-labelledby="sec-workshop">
+      <div class="section-head">
+        <h2 id="sec-workshop">Writing Workshop — يوم 6</h2>
+        <label class="section-checkbox">
+          <input type="checkbox" data-section="WORKSHOP" aria-label="إكمال Workshop">
+          <span>أُنجِز</span>
+        </label>
+      </div>
+      <div class="section-body">
+        <label for="workshopTopic" style="display:block;margin-bottom:8px;font-weight:500">موضوع Workshop اليوم</label>
+        <input type="text" id="workshopTopic" data-field="workshop_topic"
+               placeholder="مثال: Spelling 1 — قواعد -ed و -ing">
+
+        <label for="workshopExercise" style="display:block;margin-top:16px;margin-bottom:8px;font-weight:500">تمرين Workshop — الإجابات</label>
+        <textarea id="workshopExercise" data-field="workshop_exercise" rows="6"></textarea>
+      </div>
+    </section>
+
+    <section class="section writing-only" data-section="WEEKLY_PROJECT" aria-labelledby="sec-weekly">
+      <div class="section-head">
+        <h2 id="sec-weekly">مشروع الأسبوع الكتابي (200+ كلمة)</h2>
+        <label class="section-checkbox">
+          <input type="checkbox" data-section="WEEKLY_PROJECT" aria-label="إكمال مشروع الأسبوع">
+          <span>أُنجِز</span>
+        </label>
+      </div>
+      <div class="section-body">
+        <label for="weeklyProjectTopic" style="display:block;margin-bottom:8px;font-weight:500">موضوع المشروع</label>
+        <input type="text" id="weeklyProjectTopic" data-field="weekly_project_topic">
+
+        <label for="weeklyProjectText" style="display:block;margin-top:16px;margin-bottom:8px;font-weight:500">النص الكامل</label>
+        <textarea id="weeklyProjectText" data-field="weekly_project_text" data-min-words="200" rows="10"></textarea>
+        <div class="word-counter-wrap">
+          <span class="word-counter" data-counter-for="weekly_project_text">0 كلمة</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="section writing-only" data-section="SELF_EDIT" aria-labelledby="sec-selfedit">
+      <div class="section-head">
+        <h2 id="sec-selfedit">التصحيح الذاتي للمشروع</h2>
+      </div>
+      <div class="section-body">
+        <label for="selfEditSpelling" style="display:block;margin-bottom:8px;font-weight:500">أخطاء إملائيّة اكتشفتها بنفسك</label>
+        <textarea id="selfEditSpelling" data-field="self_edit_spelling" rows="3"></textarea>
+
+        <label for="selfEditGrammar" style="display:block;margin-top:16px;margin-bottom:8px;font-weight:500">أخطاء قواعديّة اكتشفتها بنفسك</label>
+        <textarea id="selfEditGrammar" data-field="self_edit_grammar" rows="3"></textarea>
+
+        <label for="selfEditPunctuation" style="display:block;margin-top:16px;margin-bottom:8px;font-weight:500">أخطاء ترقيم اكتشفتها</label>
+        <textarea id="selfEditPunctuation" data-field="self_edit_punctuation" rows="3"></textarea>
+
+        <label for="totalErrorsBefore" style="display:block;margin-top:16px;margin-bottom:8px;font-weight:500">عدد الأخطاء الإجمالي قبل التصحيح</label>
+        <input type="number" id="totalErrorsBefore" data-field="total_errors_before" min="0">
+      </div>
+    </section>
+
     <section class="section" data-section="MINTDECK" aria-labelledby="sec-mintdeck">
       <div class="section-head">
         <h2 id="sec-mintdeck">MintDeck</h2>
@@ -227,6 +305,49 @@
       <ul class="success-checklist">
         {{SUCCESS_CRITERIA}}
       </ul>
+    </section>
+
+    <section class="section" data-section="ACTUAL_TIMES" aria-labelledby="sec-actual-times">
+      <div class="section-head">
+        <h2 id="sec-actual-times">الأوقات الفعليّة</h2>
+      </div>
+      <div class="section-body">
+        <div class="grid-2">
+          <div>
+            <label for="carMinutes" style="display:block;margin-bottom:8px;font-weight:500">السيّارة (دقيقة)</label>
+            <input type="number" id="carMinutes" data-field="actual_car_minutes" min="0" max="180" placeholder="0">
+          </div>
+          <div>
+            <label for="homeMinutes" style="display:block;margin-bottom:8px;font-weight:500">البيت (دقيقة)</label>
+            <input type="number" id="homeMinutes" data-field="actual_home_minutes" min="0" max="300" placeholder="0">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" data-section="RATING" aria-labelledby="sec-rating">
+      <div class="section-head">
+        <h2 id="sec-rating">الإحساس بالتقدّم</h2>
+      </div>
+      <div class="section-body">
+        <div class="rating-grid">
+          <div class="rating-item">
+            <label for="ratingDifficulty">صعوبة اليوم (1-10)</label>
+            <input type="range" id="ratingDifficulty" data-field="rating_difficulty" min="1" max="10" value="5">
+            <span class="rating-value">5</span>
+          </div>
+          <div class="rating-item">
+            <label for="ratingProductivity">إنتاجيّة اليوم (1-10)</label>
+            <input type="range" id="ratingProductivity" data-field="rating_productivity" min="1" max="10" value="5">
+            <span class="rating-value">5</span>
+          </div>
+          <div class="rating-item">
+            <label for="ratingConfidence">ثقة الكتابة (1-10)</label>
+            <input type="range" id="ratingConfidence" data-field="rating_confidence" min="1" max="10" value="5">
+            <span class="rating-value">5</span>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="section" aria-labelledby="sec-export">

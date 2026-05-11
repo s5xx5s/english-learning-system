@@ -27,6 +27,12 @@ title: "Present Simple — Stative Verbs & 3rd Person"
 goal: "بعد اليوم، تستطيع وصف روتين شخص آخر بـ 5 جمل دون أخطاء في الـ s"
 duration_minutes: 150
 
+# Day type — يحدّد أيّ أقسام تظهر في صفحة الدرس.
+#   regular    = أيّام 1-5 (الافتراضي)
+#   writing    = يوم 6: يُظهر Writing Workshop + Weekly Project + Self-Edit
+#   reflection = يوم 7: يُخفي Grammar + Spelling
+day_type: "regular"
+
 # Section timers (دقائق لكل قسم)
 timers:
  podcast: 40
@@ -379,6 +385,7 @@ date: "YYYY-MM-DD"
 title: ""
 goal: ""
 duration_minutes: 150
+day_type: "regular"
 
 timers:
  podcast: 40

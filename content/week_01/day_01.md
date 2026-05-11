@@ -1,9 +1,9 @@
 ---
 day: 1
 week: 1
-date: "2026-05-12"
-title: "Present Simple — Stative Verbs & 3rd Person"
-goal: "بعد اليوم، تستطيع وصف روتين شخص آخر بـ 5 جمل دون أخطاء في الـ s"
+date: "2026-05-11"
+title: "Present Simple — Stative Verbs & 3rd Person Singular"
+goal: "بعد اليوم، تستطيع وصف روتين شخص آخر بـ 5 جمل دون أخطاء في الـ s/-es/-ies"
 duration_minutes: 150
 
 timers:
@@ -18,8 +18,11 @@ timers:
 
 voice_prompt: |
   Day 1. Target grammar: Present Simple — focus on third person singular
-  (he/she/it) with correct -s/-es/-ies endings. Push me to talk about
-  other people, not just myself. Let's start.
+  (he/she/it) with correct -s/-es/-ies endings, and stative verbs (no -ing).
+  Push me to talk about OTHER people: my brother, my colleague, my best friend.
+  Don't let me get away with "he work" or "she don't like". Interrupt me.
+  At the end, when I say "Give me today's report", generate the JSON report.
+  Let's start.
 
 resources:
   podcast_url: "https://www.bbc.co.uk/programmes/p02pc9tn"
@@ -29,128 +32,550 @@ resources:
 
 youglish_words:
   - word: "works"
-    note: "نطق /s/"
+    note: "نطق /s/ — الصوت قبلها /k/ (بدون اهتزاز)"
   - word: "goes"
-    note: "نطق /z/"
+    note: "نطق /z/ — الصوت قبلها صوتي"
+  - word: "watches"
+    note: "نطق /ɪz/ — لأنّها تنتهي بـ -ch"
+  - word: "studies"
+    note: "نطق /z/ — تحوّل -y إلى -ies"
 
 writing:
   topic: "A day in the life of someone I know"
   target_words: 50
   requirements:
-    - "استخدم 3rd person singular (he/she)"
-    - "Present Simple فقط"
+    - "اكتب عن شخص واحد (he/she) — أخوك، زميل، صديق"
+    - "Present Simple فقط — لا past، لا continuous"
+    - "8 أفعال على الأقل بـ -s/-es/-ies"
+    - "2 stative verbs على الأقل (knows, believes, likes, prefers...)"
+    - "راجع كل فعل: هل أضفت الـ s؟"
 
 success_criteria:
-  - "استمعت لحلقة بودكاست"
-  - "أكملت تمرين القاعدة"
+  - "استمعت لحلقة بودكاست + استخرجت 5 كلمات جديدة"
+  - "أكملت 3 MCQ + 5 Fill-in-blank + 3 جمل كتابة حرّة"
+  - "أكملت تمرين Spelling (12 كلمة في سياق)"
+  - "قرأت قصة + استخرجت 5 أفعال في 3rd person"
+  - "سجّلت نفسي قبل/بعد YouGlish لكلمة واحدة على الأقل"
+  - "تحدّثت مع ChatGPT 25 دقيقة + JSON جاهز"
   - "كتبت 50 كلمة عن شخص آخر"
+  - "استوردت 15 بطاقة في MintDeck"
+  - "رفعت التقرير اليومي"
 
 mintdeck_tsv: |
   Word	Meaning	Example	YouGlish
   understands	يفهم	He understands what you mean.	https://youglish.com/pronounce/understands/english/us
   believes	يصدّق	She believes in hard work.	https://youglish.com/pronounce/believes/english/us
+  belongs	ينتمي / يخصّ	This book belongs to my brother.	https://youglish.com/pronounce/belongs/english/us
+  contains	يحتوي	This bottle contains water.	https://youglish.com/pronounce/contains/english/us
+  prefers	يفضّل	She prefers coffee over tea.	https://youglish.com/pronounce/prefers/english/us
+  realizes	يدرك	He realizes his mistake now.	https://youglish.com/pronounce/realizes/english/us
+  notices	يلاحظ	She notices every detail.	https://youglish.com/pronounce/notices/english/us
+  owns	يمتلك	My uncle owns three houses.	https://youglish.com/pronounce/owns/english/us
+  seems	يبدو	He seems tired today.	https://youglish.com/pronounce/seems/english/us
+  watches	يشاهد	My father watches the news every night.	https://youglish.com/pronounce/watches/english/us
+  studies	يدرس	She studies medicine in Cairo.	https://youglish.com/pronounce/studies/english/us
+  goes	يذهب	He goes to the gym on Mondays.	https://youglish.com/pronounce/goes/english/us
+  tries	يحاول	She tries her best every day.	https://youglish.com/pronounce/tries/english/us
+  fixes	يصلح	My brother fixes computers for a living.	https://youglish.com/pronounce/fixes/english/us
+  enjoys	يستمتع	He enjoys long walks in the morning.	https://youglish.com/pronounce/enjoys/english/us
 ---
 
 ## WHY
 
-**سيناريو افتتاحي:** تخيّل أنّك تصف عادات صديق لشخص جديد. تقول "He work at Google" — والشخص يبتسم بأدب. هذا الفرق بين B1 و B2.
+تخيّل هذا المشهد: أنت في مقابلة عمل في شركة تقنية. المدير ينظر إليك ويقول:
 
-اليوم نُتقن الـ **3rd person singular** ونزيل هذي الـ "tell" نهائياً.
+> "Tell me about your previous manager. What kind of person is he?"
+
+تردّ بحماس: *"He work very hard. He don't like lazy people. He always understanding our problems."*
+
+المدير يبتسم بأدب — لكن في رأسه، خصم 30% من تقييمك.
+
+ثلاث جمل، ثلاث أخطاء، ثلاث قواعد فقدتها في خمس ثوانٍ. **"He work"** (نسيت الـ s). **"He don't"** (نسيت doesn't). **"He understanding"** (استخدمت -ing مع stative verb).
+
+هذي القواعد الثلاث هي **محور اليوم**. لو أتقنتها، تستطيع أن تتكلّم عن أيّ شخص في حياتك بثقة. لو فقدتها، ستبدو كمتعلّم سنة أولى رغم سنوات الدراسة.
 
 ## HOOK
 
-:::callout type="warning"
-**خطأ شائع للعرب:** نسيان الـ -s مع `he/she/it`. الذاكرة العضليّة قويّة لأنّ معظم لغات العرب لا تحتاجه.
-:::
+⚠️ **ثلاثة فخاخ خاصة بالعرب — احذرها قبل ما تتعلّم القاعدة:**
+
+**الفخّ الأوّل: نسيان الـ s مع he/she/it**
+
+في العربية: "هو يعمل" — لا يوجد فرق صرفي بين "أنا أعمل" و "هو يعمل". في الإنقليزية، الفرق صارخ:
+- I work / You work / We work / **He workS**
+
+دماغك مبرمَج على عدم رؤية الفرق. النتيجة: تنسى الـ s **حتى لو تعرف القاعدة**.
+
+**الفخّ الثاني: استخدام -ing مع Stative Verbs**
+
+تترجم "أنا أفهمك" حرفياً → *"I am understanding you"* ❌
+
+في الإنقليزية، أفعال الإدراك والمشاعر (know, understand, believe, like, want) **لا تُصرَّف بـ -ing** في Present Simple. الفعل بشكله الأصلي يعني الحالة المستمرّة فعلاً.
+
+**الفخّ الثالث: don't بدل doesn't مع 3rd person**
+
+"هو لا يحبّ" → *"He don't like"* ❌
+- الصحيح: **He doesn't like** (والفعل يرجع للأصل: like، ليس likes)
+
+> 💡 **القاعدة الذهبية:** مع `doesn't`، الفعل **يفقد** الـ s — لأنّ الـ does هو الذي حملها.
 
 ## GRAMMAR
 
-في Present Simple، نضيف `-s/-es/-ies` للفعل عندما يكون الفاعل في **3rd person singular** (he/she/it/اسم مفرد).
+### المبدأ الأساسي
 
-- **العادي:** `work → works`
-- **ينتهي بـ -ch / -sh / -x:** `watch → watches`
-- **ينتهي بـ -y بعد ساكن:** `study → studies`
+**Present Simple = الحالة الثابتة.** ليس "الآن"، بل "دائماً، عموماً، كحقيقة".
+
+| الاستخدام | مثال |
+|---|---|
+| روتين دائم | She **drinks** coffee every morning. |
+| حقيقة عن شخص | My brother **lives** in Riyadh. |
+| حقيقة علمية | Water **boils** at 100°C. |
+| مشاعر / إدراك (stative) | I **know** the answer. |
+| جدول ثابت | The train **leaves** at 8 tomorrow. |
+
+### Stative Verbs (الأفعال الحالية — لا تأخذ -ing)
+
+هذي الأفعال تصف **حالة داخلية**، ليست فعلاً قابلاً للملاحظة:
+الإدراك:    know, understand, believe, mean, remember, forget, realize, notice
+المشاعر:    love, hate, like, want, need, prefer, mind
+الملكية:    have, own, belong, contain, consist, include
+الإحساس:    seem, appear, look, sound, taste, smell
+
+> ⚠️ "I am knowing him" خطأ. الصحيح: **"I know him"**.
+
+### 3rd Person Singular — الجدول الكامل
+
+| الضمير | Positive | Negative | Question |
+|---|---|---|---|
+| I / You / We / They | I **work** | I **don't** work | **Do** you work? |
+| He / She / It | She **works** | She **doesn't** work | **Does** she work? |
+
+**انتبه:** مع `does/doesn't`، الفعل **يرجع للأصل**:
+- ❌ She doesn't ~~works~~ here.
+- ✅ She doesn't **work** here.
 
 ## GRAMMAR_EXERCISES
 
-:::mcq id="q1"
-**Q:** أيّ الجمل صحيحة؟
-- [ ] He work at Google.
-- [x] He works at Google.
-- [ ] He working at Google.
-
-**Explanation:** في 3rd person singular نضيف `-s` للفعل.
+:::callout type="info"
+**التعليمات:** اقرأ كل سؤال بتمعّن. الإجابة الخاطئة تعلّمك أكثر من الصحيحة لو فهمتَ سبب الخطأ.
 :::
+
+### MCQ — اختر الصحيح
+
+:::mcq id="q1"
+**Q:** صديقك يسألك عن مديرك. أيّ الجمل صحيحة؟
+- [ ] My manager work at Google for 10 years.
+- [x] My manager works at Google.
+- [ ] My manager is working at Google for 10 years.
+- [ ] My manager working at Google.
+
+**Explanation:** 3rd person singular (he/she/it) يحتاج -s. "is working" خطأ لأنّ Present Continuous للحظة الآن فقط، لا للحقيقة الثابتة. "working" بدون مساعد لا يكوّن جملة كاملة.
+:::
+
+:::mcq id="q2"
+**Q:** أيّ الجمل صحيحة عن stative verbs؟
+- [ ] I am knowing the answer.
+- [ ] I am understanding what you mean.
+- [x] I know the answer.
+- [ ] I knowing the answer.
+
+**Explanation:** know و understand من الـ stative verbs — لا تأخذ -ing في Present Simple. الفعل بشكله الأصلي يعني الحالة المستمرّة.
+:::
+
+:::mcq id="q3"
+**Q:** كيف تسأل عن روتين أخيك؟
+- [ ] Does your brother works here?
+- [ ] Do your brother work here?
+- [x] Does your brother work here?
+- [ ] Is your brother working here?
+
+**Explanation:** مع "Does"، الفعل يرجع للأصل (بدون -s). الـ does هو الذي يحمل علامة 3rd person.
+:::
+
+### Fill-in-blank — أكمل الجملة
 
 :::fillblank id="fb1"
-**Sentence:** She _____ TV every night.
-**Answer:** watches
-**Hint:** فعل ينتهي بـ -ch
-**Rule:** -ch → -es
+**Sentence:** My sister _____ English at university.
+**Answer:** studies
+**Hint:** ساكن + y → ?
+**Rule:** study → studies (3rd person singular، استبدل y بـ ies)
 :::
 
+:::fillblank id="fb2"
+**Sentence:** He _____ the news every night at 9.
+**Answer:** watches
+**Hint:** الفعل ينتهي بـ -ch، نحتاج علامة 3rd person
+**Rule:** watch → watches (-ch → -es)
+:::
+
+:::fillblank id="fb3"
+**Sentence:** She _____ believe in superstitions.
+**Answer:** doesn't
+**Hint:** نفي في 3rd person singular
+**Rule:** 3rd person negative = doesn't + base verb (believe، ليس believes)
+:::
+
+:::fillblank id="fb4"
+**Sentence:** I _____ what you mean now.
+**Answer:** understand
+**Hint:** stative verb، لا -ing
+**Rule:** Stative verbs لا تأخذ -ing — استخدم الشكل الأصلي للفعل
+:::
+
+:::fillblank id="fb5"
+**Sentence:** My father _____ to the mosque every Friday.
+**Answer:** goes
+**Hint:** الفعل ينتهي بـ -o، نحتاج علامة 3rd person
+**Rule:** go → goes (-o → -es)
+:::
+
+### Free Writing — جملك أنت
+
 :::freewriting id="fw1"
-**Prompt:** اكتب 3 جمل عن شخص تعرفه باستخدام 3rd person singular.
+**Prompt:** اكتب 3 جمل عن **شخص واحد تعرفه** (أخوك، أمّك، صديقك، زميل).
 **Min words:** 20
 **Target structures:**
-- 3rd person singular (-s ending)
-- 1 stative verb
+- 3rd person singular مع -s/-es/-ies (3 أفعال على الأقل)
+- Stative verb واحد على الأقل (knows, likes, believes, understands...)
+- لا تستخدم "I" — اكتب عنه/عنها فقط
+:::
+
+:::callout type="warning"
+**قبل ما تكمل:** ارجع لجملك الثلاث. ضع دائرة حول كل فعل. هل في كل واحد منها **-s أو -es أو -ies**؟ لو في فعل بدون علامة — صحّحه الآن.
 :::
 
 ## SPELLING
 
-**قاعدة:** الأفعال التي تنتهي بـ `-y` بعد حرف ساكن: نُبدِل الـ `y` بـ `i` ثمّ نضيف `-es`.
+### 🔗 لماذا الإملاء **الآن**؟
 
-`study → studies` · `try → tries` · `fly → flies`
+تعلّمت قاعدة الـ s في 3rd person — لكن الـ "s" ليست دائماً مجرّد s. هي **أربع قواعد إملائية مختلفة** حسب نهاية الفعل. لو لم تتقنها، ستكتب "He studys" بدل "studies"، و"She watchs" بدل "watches". هذي الأخطاء تكشف مستواك فوراً.
+
+### القواعد الأربع
+
+**القاعدة 1 (الافتراضية): الفعل + s**
+- work → works
+- play → plays
+- run → runs
+- listen → listens
+
+**القاعدة 2: ينتهي بـ -s, -ss, -sh, -ch, -x, -z, -o → أضف -es**
+
+(لأنّ النطق يستحيل بدون e — جرّب: "watchs" 🤔)
+
+| الفعل | 3rd person |
+|---|---|
+| watch | watch**es** |
+| wash | wash**es** |
+| miss | miss**es** |
+| fix | fix**es** |
+| buzz | buzz**es** |
+| go | go**es** |
+| do | do**es** |
+
+**القاعدة 3: ساكن + y → استبدل بـ -ies**
+
+| الفعل | 3rd person |
+|---|---|
+| study | stud**ies** |
+| try | tr**ies** |
+| carry | carr**ies** |
+| fly | fl**ies** |
+| cry | cr**ies** |
+
+**القاعدة 4: متحرّك + y → أضف -s فقط (لا تغيّر y!)**
+
+| الفعل | 3rd person |
+|---|---|
+| play | play**s** (ليس plies!) |
+| enjoy | enjoy**s** |
+| say | say**s** |
+| buy | buy**s** |
+
+> 💡 **الفرق بين القاعدتين 3 و 4:** انظر للحرف **قبل** الـ y. لو ساكن (st**u**dy → د) → ies. لو متحرّك (pl**a**y → a) → s فقط.
+
+### نطق الـ -s/-es (3 أصوات)
+
+| الصوت | متى | أمثلة |
+|---|---|---|
+| **/s/** | بعد أصوات صامتة (p, t, k, f) | works, stops, eats |
+| **/z/** | بعد أصوات صوتية + متحرّكات | goes, plays, runs |
+| **/ɪz/** | بعد -s, -sh, -ch, -x, -z | watches, washes, fixes |
+
+> جرّب نطقها: لو نطقتها /s/ بدل /ɪz/، ستلتصق الأصوات ولن تُفهَم.
 
 ## SPELLING_EXERCISES
 
-:::fillblank id="fb-sp1"
-**Sentence:** He _____ very hard for the exam.
+:::callout type="info"
+**التعليمات:** كل تمرين هنا **جملة كاملة** — ليس مجرّد كلمة. لأنّ الإملاء يُتقَن في السياق، لا في القوائم.
+:::
+
+:::fillblank id="sp1"
+**Sentence:** My mother always _____ (watch) the news at 9 PM.
+**Answer:** watches
+**Hint:** ينتهي بـ -ch
+**Rule:** القاعدة 2: -ch → -es
+:::
+
+:::fillblank id="sp2"
+**Sentence:** He _____ (study) medicine at King Saud University.
 **Answer:** studies
-**Hint:** -y بعد ساكن
-**Rule:** y → ies
+**Hint:** ساكن (d) + y
+**Rule:** القاعدة 3: ساكن + y → -ies
+:::
+
+:::fillblank id="sp3"
+**Sentence:** She _____ (play) the piano every Saturday.
+**Answer:** plays
+**Hint:** متحرّك (a) + y
+**Rule:** القاعدة 4: متحرّك + y → -s فقط
+:::
+
+:::fillblank id="sp4"
+**Sentence:** My brother _____ (fix) old cars as a hobby.
+**Answer:** fixes
+**Hint:** ينتهي بـ -x
+**Rule:** القاعدة 2: -x → -es
+:::
+
+:::fillblank id="sp5"
+**Sentence:** The bus _____ (go) to downtown every 20 minutes.
+**Answer:** goes
+**Hint:** ينتهي بـ -o
+**Rule:** القاعدة 2: -o → -es
+:::
+
+:::fillblank id="sp6"
+**Sentence:** She _____ (try) her best in every exam.
+**Answer:** tries
+**Hint:** ساكن (r) + y
+**Rule:** القاعدة 3: ساكن + y → -ies
+:::
+
+:::fillblank id="sp7"
+**Sentence:** He _____ (enjoy) reading before bed.
+**Answer:** enjoys
+**Hint:** متحرّك (o) + y
+**Rule:** القاعدة 4: متحرّك + y → -s فقط
+:::
+
+:::fillblank id="sp8"
+**Sentence:** My uncle _____ (own) a small grocery store.
+**Answer:** owns
+**Hint:** فعل عادي ينتهي بـ -n
+**Rule:** القاعدة 1 (الافتراضية): + s
+:::
+
+:::fillblank id="sp9"
+**Sentence:** She _____ (wash) her car every Friday morning.
+**Answer:** washes
+**Hint:** ينتهي بـ -sh
+**Rule:** القاعدة 2: -sh → -es
+:::
+
+:::fillblank id="sp10"
+**Sentence:** My grandfather _____ (carry) a small notebook everywhere.
+**Answer:** carries
+**Hint:** ساكن (r) + y
+**Rule:** القاعدة 3: ساكن + y → -ies
+:::
+
+:::fillblank id="sp11"
+**Sentence:** Hassan _____ (say) the same joke every time.
+**Answer:** says
+**Hint:** متحرّك (a) + y — انتبه! نطقها /sez/ لكن إملاؤها says
+**Rule:** القاعدة 4: متحرّك + y → -s فقط
+:::
+
+:::fillblank id="sp12"
+**Sentence:** My sister _____ (miss) her old friends from school.
+**Answer:** misses
+**Hint:** ينتهي بـ -ss
+**Rule:** القاعدة 2: -ss → -es
+:::
+
+:::callout type="success"
+**Mini-Review (توقّف 30 ثانية):** بدون أن ترجع للقواعد — ما الفرق بين "studies" و "plays"؟ لو عرفت الإجابة، أنت أتقنت القاعدتين 3 و 4.
 :::
 
 ## READING
 
-اقرأ القصّة من الرابط أعلاه. **استخرج 3 أفعال** في صيغة 3rd person singular ولاحظ النهاية.
+📖 **{{reading_title}}** — Level 2
+
+**مدّة المهمّة:** 15 دقيقة
+
+### التعليمات (لا "اقرأ" فقط — بل ابحث)
+
+اختر **قصّة واحدة** (5-10 دقائق قراءة)، ثم:
+
+1. **القراءة الأولى (5 دقائق):** اقرأ القصّة كاملة لفهم الموضوع. لا تتوقّف عند الكلمات المجهولة.
+
+2. **القراءة الثانية (5 دقائق) — مهمّة محدّدة:**
+   - **استخرج 5 أفعال في 3rd person singular** (انتهت بـ -s, -es, أو -ies)
+   - لكل فعل، اكتب: الفعل الأصلي + شكله في القصّة + القاعدة (1، 2، 3، أو 4)
+
+   | الفعل في القصّة | الفعل الأصلي | القاعدة |
+   |---|---|---|
+   | (مثال) wishes | wish | 2 (-sh → -es) |
+   |  |  |  |
+   |  |  |  |
+
+3. **استخراج المفردات (5 دقائق):** 5 كلمات جديدة + جملة من القصّة لكل واحدة.
+
+:::callout type="info"
+**نصيحة:** اختَر قصّة عن شخص ثالث (he/she)، لا عن "I". ستجد علامات 3rd person في كل سطر.
+:::
 
 ## PRONUNCIATION
 
-نهاية `-s` تُلفظ بثلاث طرق مختلفة:
+🔊 **مدّة الجلسة:** 10 دقائق
 
-- `/s/` بعد أصوات غير مصوّتة (works, hits)
-- `/z/` بعد أصوات مصوّتة (goes, plays)
-- `/ɪz/` بعد أصوات صفيريّة (watches, washes)
+### الكلمات الأربع (تطبيق على الأصوات الثلاثة)
 
 :::youglish
-- works | نطق /s/
-- goes | نطق /z/
-- watches | نطق /ɪz/
+- works | نطق /s/ — الصوت قبلها /k/ (بدون اهتزاز)
+- goes | نطق /z/ — الصوت قبلها صوتي
+- watches | نطق /ɪz/ — لأنّها تنتهي بـ -ch
+- studies | نطق /z/ — تحوّل -y إلى -ies
 :::
+
+### Shadowing — الخطوات
+
+1. اختر جملة واحدة من YouGlish فيها الكلمة (المدّة المثلى: 5-10 ثوانٍ)
+2. اسمعها **3 مرّات** بدون تكرار
+3. كرّرها **10 مرّات** — قلّد النبرة والإيقاع، لا فقط الكلمات
+
+### تسجيل قبل/بعد
 
 :::voicerecorder id="vr1" word="watches"
-**Task:** سجّل نفسك تنطق "watches" قبل سماع YouGlish، ثم بعده. قارن.
+**Task:** سجّل نفسك تنطق "She watches the news every night" **قبل** سماع YouGlish، ثم **بعد** التكرار 10 مرّات. قارن. هل تنطق -ches كـ /ɪz/ الآن؟
 :::
+## CHATGPT
 
+🎙️ **مدّة الجلسة:** 25 دقيقة | **الموقع:** ChatGPT app على iPhone (Voice Mode)
+
+### قبل أن تبدأ
+
+- [ ] فتحتُ محادثة **هذا الأسبوع** في ChatGPT (نفس المحادثة لكل الأسبوع)
+- [ ] لصقتُ **Master Prompt** في أوّل المحادثة (مرّة واحدة في بداية الأسبوع — موجود في `master_plan_v3.md`)
+- [ ] رددتُ ChatGPT بـ "Ready"
+- [ ] فعّلتُ Voice Mode الآن
+
+### Voice Prompt لليوم — انسخه فوراً
+
+:::callout type="info"
+**انسخ هذا النصّ كاملاً والصقه في ChatGPT (Voice Mode):**
+:::
+Day 1. Target grammar: Present Simple — focus on third person singular
+(he/she/it) with correct -s/-es/-ies endings, and stative verbs (no -ing).
+Push me to talk about OTHER people: my brother, my colleague, my best friend.
+Don't let me get away with "he work" or "she don't like". Interrupt me.
+At the end, when I say "Give me today's report", generate the JSON report.
+Let's start.
+
+### أهداف الجلسة (للمتابعة الذاتية)
+
+- [ ] تحدّثت 25 دقيقة كاملة (لا تتوقّف عند 10!)
+- [ ] استخدمت 3rd person singular **20 مرّة على الأقل**
+- [ ] استخدمت stative verbs **5 مرّات على الأقل**
+- [ ] تكلّمت عن **3 أشخاص مختلفين**
+- [ ] قلت "Give me today's report" في النهاية
+- [ ] حفظت الـ JSON الناتج
+
+### بعد الجلسة
+
+1. انسخ الـ JSON الكامل من ChatGPT
+2. الصقه في تقرير اليوم (سيتمّ تلقائياً عبر زرّ "نسخ Markdown للتقرير")
+3. لا تحلّل أخطاءك بنفسك — أنا أحلّلها لك غداً عند طلب اليوم 2
+
+:::callout type="warning"
+**خطأ شائع:** الناس يكتبون الـ Voice Prompt من ذاكرتهم. **لا تفعل** — استخدم النصّ المكتوب بالضبط. كل كلمة فيه مقصودة (خصوصاً "Interrupt me").
+:::
 ## WRITING_GUIDE
 
-اكتب 50 كلمة عن **يوم في حياة شخص تعرفه**.
+✍️ **مدّة الكتابة:** 15 دقيقة | **الهدف:** 50 كلمة
 
-:::freewriting id="fw-main"
-**Prompt:** A day in the life of someone you know. Use 3rd person singular throughout.
+### قبل الكتابة (دقيقتان)
+
+اختر **شخصاً واحداً تعرفه جيّداً**:
+- أخوك / أختك / أمّك / أبوك
+- زميل في العمل / صديق من الجامعة
+
+اكتب اسمه في ذهنك (لا داعي لكتابته في النصّ).
+
+### بنية الفقرة المقترحة
+الجملة 1: من هو + ماذا يعمل
+(مثال: My brother works as an engineer at Aramco.)
+الجملة 2-3: روتينه اليومي (3rd person + -s)
+(مثال: He wakes up at 5 AM. He goes to the gym before work.)
+الجملة 4: ما يحبّه/يكرهه (stative verb)
+(مثال: He loves coffee but he doesn't like tea.)
+الجملة 5: شيء يميّزه (3rd person + -s)
+(مثال: He always carries a black notebook with him.)
+
+### قاعدة الكتابة الحرّة
+
+:::freewriting id="fw_main" 
+**Prompt:** A day in the life of someone I know — اكتب 50 كلمة عن شخص تعرفه. اتبع البنية المقترحة لكنها ليست إلزامية.
 **Min words:** 50
 **Target structures:**
-- 8 أفعال على الأقل تحتاج -s/-es/-ies
-- 2 stative verbs على الأقل
-- Present Simple فقط
+- لا تستخدم "I" مطلقاً — كل الفعل مع he/she/it
+- 8 أفعال على الأقل بـ -s/-es/-ies
+- 2 stative verbs على الأقل (knows, likes, prefers, believes...)
+- Present Simple فقط — لا past، لا continuous
+- استخدم قاعدتين مختلفتين على الأقل من الـ 4 الإملائية
+:::
+
+### Self-Edit Checklist (3 دقائق — إلزامي قبل الإرسال)
+
+اقرأ نصّك **بصوت عالٍ**، وتحقّق:
+
+- [ ] هل كل فعل بعد he/she/it فيه **-s، -es، أو -ies**؟ (ضع دائرة حول كل واحد)
+- [ ] هل استخدمت **doesn't** (ليس don't) للنفي؟
+- [ ] هل أيّ stative verb (know, like, want...) **بدون -ing**؟
+- [ ] هل كل جملة تنتهي بنقطة؟
+- [ ] هل كل جملة تبدأ بحرف كبير؟
+- [ ] هل عدد الكلمات **50 أو أكثر**؟
+
+:::callout type="warning"
+**لا ترسل النصّ قبل ما تكمل الـ Checklist. الإرسال السريع = أخطاء تتكرّر.**
 :::
 
 ## MINTDECK
 
-استورِد البطاقات أعلاه إلى MintDeck. ركّز على **stative verbs** اليوم.
+💾 **15 بطاقة لاستيرادها في MintDeck**
+
+البطاقات الـ 15 موجودة في الـ Frontmatter (`mintdeck_tsv`) ومُولَّدة في الصفحة كزرّ نسخ.
+
+### كيف تستوردها
+
+1. اضغط زرّ **"نسخ TSV"** أعلى هذا القسم
+2. افتح MintDeck على iPhone
+3. اختر deck **"English-Daily"** → Import → Paste
+4. تأكّد من فصل الحقول بـ Tab (ليس فاصلة)
+
+### ملاحظات على البطاقات
+
+- **كل البطاقات في 3rd person singular** — هذي إعادة تأكيد للقاعدة، ليس فقط مفردات
+- **9 stative verbs + 6 action verbs** — توازن مقصود
+- **YouGlish في كل بطاقة** — لمّا تظهر البطاقة، اضغط الرابط واسمع الكلمة في سياق طبيعي
 
 :::callout type="info"
-**ملاحظة:** الـ stative verbs (`understand`, `believe`, `know`, `love`) لا تأخذ `-ing`.
+**خطأ شائع:** الناس يستوردون البطاقات وينسونها. **القاعدة:** أوّل مراجعة الليلة بعد العشاء، ثاني مراجعة غداً قبل النوم. بعدها FSRS algorithm يتولّى الجدولة.
 :::
+
+---
+
+## 🎬 ChatGPT Voice Session — 25 دقيقة
+
+افتح ChatGPT → محادثة جديدة → الصق **Master Prompt** (موجود في `master_plan_v3.md` أو في أوّل محادثة الأسبوع).
+
+ثم استخدم هذا الـ Voice Prompt:
+
+> {{voice_prompt}}
+
+في نهاية المحادثة، قل: **"Give me today's report"** → احفظ الـ JSON → الصقه في تقريرك اليومي.
+
+---
+
+## 📤 تقرير اليوم
+
+اضغط زرّ **"📋 نسخ Markdown للتقرير"** في نهاية الصفحة. الصقه في محادثة Claude مع: **"اليوم 2 من فضلك"**.

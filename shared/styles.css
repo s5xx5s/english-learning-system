@@ -714,6 +714,90 @@ textarea { resize: vertical; min-height: 100px; font-family: inherit; line-heigh
 .legend-swatch.is-completed { background: var(--success-bg); border-color: var(--success); }
 .legend-swatch.is-unbuilt   { background: var(--bg-secondary); opacity: 0.45; }
 
+/* 20d. Day Type Toggle ----------------------------------------------- */
+.day-type-toggle {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+.day-type-btn {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  transition: border-color var(--transition), background var(--transition), color var(--transition);
+}
+.day-type-btn:hover { border-color: var(--primary); }
+.day-type-btn.active {
+  background: var(--primary);
+  color: var(--bg-primary);
+  border-color: var(--primary);
+}
+
+/* Writing-only sections are hidden unless the body opts in. */
+.writing-only { display: none; }
+body.day-type-writing .writing-only { display: block; }
+
+/* Reflection-day hides certain sections. */
+body.day-type-reflection .section[data-section="GRAMMAR"],
+body.day-type-reflection .section[data-section="SPELLING"],
+body.day-type-reflection .section[data-section="GRAMMAR_EXERCISES"],
+body.day-type-reflection .section[data-section="SPELLING_EXERCISES"] {
+  display: none;
+}
+
+/* 20e. Self-rating sliders ------------------------------------------- */
+.rating-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+@media (min-width: 600px) {
+  .rating-grid { grid-template-columns: repeat(3, 1fr); }
+}
+.rating-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.rating-item input[type="range"] {
+  width: 100%;
+  accent-color: var(--primary);
+}
+.rating-value {
+  text-align: center;
+  font-weight: 600;
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  background: var(--bg-accent);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  align-self: center;
+  min-width: 48px;
+}
+
+/* 20f. Grid-2 layout used in actual-times + others ------------------- */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-3);
+}
+@media (min-width: 600px) {
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+}
+
+/* 20g. Word counter (for non-FreeWriting textareas) ------------------ */
+.word-counter-wrap {
+  margin-top: var(--space-2);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-align: end;
+}
+
 /* 20c. Daily report form -------------------------------------------- */
 .report-form { display: flex; flex-direction: column; gap: var(--space-4); }
 .field-row {

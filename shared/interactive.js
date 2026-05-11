@@ -210,12 +210,17 @@
     update() {
       const fill = $('.progress-fill');
       const label = $('.progress-label');
-      const all = $$('.section-checkbox input[type="checkbox"]');
-      if (!fill || !all.length) return;
-      const done = all.filter(cb => cb.checked).length;
-      const pct = Math.round((done / all.length) * 100);
+      // Only count visible checkboxes — writing-only sections collapse on
+      // regular/reflection days, and we don't want them to skew the count.
+      const visible = $$('.section-checkbox input[type="checkbox"]')
+        .filter(cb => cb.offsetParent !== null);
+      if (!fill || !visible.length) return;
+      const done = visible.filter(cb => cb.checked).length;
+      const pct = Math.round((done / visible.length) * 100);
       fill.style.width = pct + '%';
-      if (label) label.textContent = done + ' / ' + all.length + ' (' + pct + '%)';
+      if (label) label.textContent = done + ' / ' + visible.length + ' (' + pct + '%)';
+      const wrap = $('.progress-wrap');
+      if (wrap) wrap.setAttribute('aria-valuenow', String(pct));
     }
   };
 
@@ -405,39 +410,85 @@
     generateMarkdown(week, day) {
       if (!global.Storage) return '';
       const snap = Storage.exportDayJSON(week, day);
-      const lines = [];
-      lines.push('# تقرير اليوم — أسبوع '+ week + ' / يوم '+ day);
-      lines.push('');
-      lines.push('**تاريخ التصدير:** '+ snap.exported_at);
-      lines.push('');
       const d = snap.data || {};
-      if (Array.isArray(d.completed_sections)) {
-        lines.push('## الأقسام المكتملة');
-        d.completed_sections.forEach(s => lines.push('- '+ s));
+      const dayType = d.day_type || 'regular';
+      const lines = [];
+
+      lines.push('# Daily Report — أسبوع ' + week + ' / يوم ' + day);
+      lines.push('');
+      lines.push('**نوع اليوم:** ' + dayType);
+      lines.push('**تاريخ التصدير:** ' + snap.exported_at);
+      lines.push('');
+
+      const carM  = Number(d.actual_car_minutes  || 0);
+      const homeM = Number(d.actual_home_minutes || 0);
+      if (carM || homeM) {
+        lines.push('## الأوقات الفعليّة');
+        lines.push('- السيّارة: ' + carM + ' دقيقة');
+        lines.push('- البيت: ' + homeM + ' دقيقة');
+        lines.push('- الإجمالي: **' + (carM + homeM) + ' دقيقة**');
         lines.push('');
       }
-      if (d.writing && typeof d.writing === 'object') {
-        lines.push('## الكتابة');
-        Object.keys(d.writing).forEach(k => {
-          lines.push('### '+ k);
-          lines.push(d.writing[k] || '');
-          lines.push('');
-        });
+
+      if (Array.isArray(d.completed_sections) && d.completed_sections.length) {
+        lines.push('## الأقسام المكتملة');
+        d.completed_sections.forEach(s => lines.push('- ' + s));
+        lines.push('');
       }
-      if (d.mcq_answers) {
+
+      if (d.mcq_answers && Object.keys(d.mcq_answers).length) {
         lines.push('## إجابات MCQ');
         lines.push('```json');
         lines.push(JSON.stringify(d.mcq_answers, null, 2));
         lines.push('```');
         lines.push('');
       }
-      if (d.fillblank_answers) {
+      if (d.fillblank_answers && Object.keys(d.fillblank_answers).length) {
         lines.push('## إجابات Fill-in-blank');
         lines.push('```json');
         lines.push(JSON.stringify(d.fillblank_answers, null, 2));
         lines.push('```');
         lines.push('');
       }
+
+      if (d.story_hard_spelling) {
+        lines.push('## كلمات إملاء صعبة من القراءة');
+        lines.push(d.story_hard_spelling);
+        lines.push('');
+      }
+
+      if (d.writing && typeof d.writing === 'object') {
+        lines.push('## الكتابة (Free Writing)');
+        Object.keys(d.writing).forEach(k => {
+          lines.push('### ' + k);
+          lines.push(d.writing[k] || '');
+          lines.push('');
+        });
+      }
+
+      if (dayType === 'writing') {
+        if (d.workshop_topic || d.workshop_exercise) {
+          lines.push('## Writing Workshop');
+          if (d.workshop_topic)    lines.push('**الموضوع:** ' + d.workshop_topic);
+          if (d.workshop_exercise) { lines.push(''); lines.push('**التمارين:**'); lines.push(d.workshop_exercise); }
+          lines.push('');
+        }
+        if (d.weekly_project_topic || d.weekly_project_text) {
+          lines.push('## مشروع الأسبوع الكتابي');
+          if (d.weekly_project_topic) lines.push('**الموضوع:** ' + d.weekly_project_topic);
+          if (d.weekly_project_text)  { lines.push(''); lines.push('**النص:**'); lines.push(d.weekly_project_text); }
+          lines.push('');
+        }
+        if (d.self_edit_spelling || d.self_edit_grammar || d.self_edit_punctuation || d.total_errors_before) {
+          lines.push('## التصحيح الذاتي');
+          if (d.self_edit_spelling)    lines.push('**أخطاء إملائية:** ' + d.self_edit_spelling);
+          if (d.self_edit_grammar)     lines.push('**أخطاء قواعدية:** ' + d.self_edit_grammar);
+          if (d.self_edit_punctuation) lines.push('**أخطاء ترقيم:** ' + d.self_edit_punctuation);
+          if (d.total_errors_before)   lines.push('**إجمالي الأخطاء قبل التصحيح:** ' + d.total_errors_before);
+          lines.push('');
+        }
+      }
+
       if (d.chatgpt_json) {
         lines.push('## ChatGPT JSON');
         lines.push('```json');
@@ -445,6 +496,18 @@
         lines.push('```');
         lines.push('');
       }
+
+      if (d.rating_difficulty || d.rating_productivity || d.rating_confidence) {
+        lines.push('## الإحساس بالتقدّم');
+        lines.push('- صعوبة اليوم: ' + (d.rating_difficulty || 5) + ' / 10');
+        lines.push('- إنتاجيّة اليوم: ' + (d.rating_productivity || 5) + ' / 10');
+        lines.push('- ثقة الكتابة: ' + (d.rating_confidence || 5) + ' / 10');
+        lines.push('');
+      }
+
+      lines.push('---');
+      lines.push('');
+      lines.push('**اليوم ' + (Number(day) + 1) + ' من فضلك**');
       return lines.join('\n');
     },
 
@@ -513,6 +576,116 @@
     }
   };
 
+  /* --------- Day Type Toggle (regular / writing / reflection) ---------
+     Reads default from body class (set by build_day.js from frontmatter);
+     localStorage overrides if user toggled previously. */
+  const DayTypeToggle = {
+    init() {
+      const buttons = $$('.day-type-btn');
+      if (!buttons.length) return;
+
+      const { week, day } = getLesson();
+      const fromStorage = (week && day && global.Storage) ? global.Storage.load(week, day, 'day_type') : null;
+      const fromBody = (document.body.className.match(/day-type-(regular|writing|reflection)/) || [])[1];
+      const initial = fromStorage || fromBody || 'regular';
+      this.apply(initial, /* persist */ false);
+
+      buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          this.apply(btn.dataset.dayType || 'regular', true);
+        });
+      });
+    },
+
+    apply(type, persist) {
+      const valid = ['regular', 'writing', 'reflection'];
+      const t = (valid.indexOf(type) === -1) ? 'regular' : type;
+      document.body.classList.remove('day-type-regular', 'day-type-writing', 'day-type-reflection');
+      document.body.classList.add('day-type-' + t);
+      $$('.day-type-btn').forEach(b => {
+        b.classList.toggle('active', b.dataset.dayType === t);
+      });
+      if (persist) {
+        const { week, day } = getLesson();
+        if (week && day && global.Storage) global.Storage.save(week, day, 'day_type', t);
+      }
+      ProgressBar.update();
+    }
+  };
+
+  /* --------- Rating sliders (1-10) — load saved, update display, persist --- */
+  const RatingSliders = {
+    init() {
+      const { week, day } = getLesson();
+      $$('input[type="range"][data-field]').forEach(slider => {
+        const valueSpan = slider.parentElement && slider.parentElement.querySelector('.rating-value');
+
+        if (week && day && global.Storage) {
+          const saved = global.Storage.load(week, day, slider.dataset.field);
+          if (saved !== null && saved !== undefined && saved !== '') {
+            slider.value = String(saved);
+          }
+        }
+        if (valueSpan) valueSpan.textContent = slider.value;
+
+        slider.addEventListener('input', () => {
+          if (valueSpan) valueSpan.textContent = slider.value;
+          if (week && day && global.Storage) {
+            global.Storage.save(week, day, slider.dataset.field, slider.value);
+          }
+        });
+      });
+    }
+  };
+
+  /* --------- Generic data-field auto-save (text / number / textarea / checkbox)
+     Skips type=range (RatingSliders handles those) and any element already
+     wired by another module via data-role. */
+  const AutoSaveFields = {
+    init() {
+      const { week, day } = getLesson();
+      if (!week || !day || !global.Storage) return;
+
+      $$('[data-field]').forEach(el => {
+        if (el.type === 'range') return; // RatingSliders owns ranges
+        const field = el.dataset.field;
+
+        const saved = global.Storage.load(week, day, field);
+        if (saved !== null && saved !== undefined) {
+          if (el.type === 'checkbox') el.checked = !!saved;
+          else el.value = String(saved);
+        }
+
+        const evt = (el.type === 'checkbox') ? 'change' : 'input';
+        el.addEventListener(evt, () => {
+          const v = (el.type === 'checkbox') ? el.checked : el.value;
+          global.Storage.save(week, day, field, v);
+        });
+      });
+    }
+  };
+
+  /* --------- Word counter for textareas with linked counter span ----- */
+  const WordCounter = {
+    init() {
+      $$('.word-counter[data-counter-for]').forEach(counter => {
+        const fieldName = counter.dataset.counterFor;
+        const target = $('[data-field="' + fieldName + '"]');
+        if (!target) return;
+        const minWords = Number(target.dataset.minWords) || 0;
+        const render = () => {
+          const n = (target.value || '').trim().split(/\s+/).filter(Boolean).length;
+          counter.textContent = minWords > 0
+            ? n + ' / ' + minWords + ' كلمة'
+            : n + ' كلمة';
+          counter.classList.toggle('is-target-met', minWords > 0 && n >= minWords);
+        };
+        render();
+        target.addEventListener('input', render);
+      });
+    }
+  };
+
   /* --------- YouGlish embed toggle --------- */
   const YouGlish = {
     init() {
@@ -539,6 +712,10 @@
 
   /* --------- Boot --------- */
   function boot() {
+    DayTypeToggle.init();   // must run first — controls visibility of writing-only sections
+    AutoSaveFields.init();
+    RatingSliders.init();
+    WordCounter.init();
     MCQ.init();
     FillBlank.init();
     FreeWriting.init();
@@ -572,6 +749,7 @@
     MCQ, FillBlank, FreeWriting, Checkboxes, ProgressBar,
     SessionTimer, VoicePrompt, JSONValidator, Exporter,
     MintDeck, YouGlish, Toast,
+    DayTypeToggle, RatingSliders, AutoSaveFields, WordCounter,
     getLesson
   };
 })(typeof window !== 'undefined' ? window : globalThis);

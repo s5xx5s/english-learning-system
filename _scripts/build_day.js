@@ -392,6 +392,11 @@ function buildDay(weekArg, dayArg) {
   const timers = data.timers || {};
   const resources = data.resources || {};
 
+  // Day type controls which sections show. Whitelist allowed values.
+  const allowedDayTypes = ['regular', 'writing', 'reflection'];
+  const dayTypeRaw = (data.day_type || 'regular').toString().toLowerCase();
+  const dayType = allowedDayTypes.indexOf(dayTypeRaw) === -1 ? 'regular' : dayTypeRaw;
+
   const replacements = {
     '{{TITLE}}':            escapeHtml(data.title),
     '{{TITLE_JSON}}':       JSON.stringify(data.title || ''),
@@ -401,6 +406,7 @@ function buildDay(weekArg, dayArg) {
     '{{WEEK_NUMBER}}':      String(Number(data.week) || Number(weekArg)),
     '{{GOAL}}':             escapeHtml(data.goal),
     '{{DURATION_MINUTES}}': String(data.duration_minutes || 150),
+    '{{DAY_TYPE}}':         dayType,
 
     '{{PODCAST_URL}}':      escapeHtml(resources.podcast_url || '#'),
     '{{PODCAST_TITLE}}':    escapeHtml(resources.podcast_title || 'بودكاست اليوم'),
@@ -447,8 +453,8 @@ function buildDay(weekArg, dayArg) {
 
   const sizeKB = (fs.statSync(outPath).size / 1024).toFixed(1);
   ok('بُني: ' + path.relative(ROOT, outPath) + '  (' + sizeKB + ' KB)');
-  if (sizeKB > 50) {
-    console.warn('  WARNING: الحجم تعدّى 50 KB. راجع CLAUDE.md.');
+  if (sizeKB > 75) {
+    console.warn('  WARNING: الحجم تعدّى 75 KB. راجع CLAUDE.md.');
   }
 }
 

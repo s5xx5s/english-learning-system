@@ -60,7 +60,6 @@ _scripts\upload_day.bat 01 01
 | `npm run build:week -- 01` | يبني كل أيّام الأسبوع 01 دفعةً واحدة |
 | `_scripts\upload_week.bat 01` | يرفع كل ملفّات الأسبوع 01 دفعةً واحدة |
 | `index.html` | لوحة التحكّم — تعرض تقدّمك في 36×7 خليّة |
-| `reports/daily_report.html` | نموذج التقرير اليومي للنسخ في رسالة Claude |
 
 ## بنية المجلّدات
 
@@ -90,9 +89,6 @@ english-learning-system/
 ├── templates/                 قوالب البناء
 │   ├── lesson_template.html
 │   └── day_template.md
-│
-├── reports/
-│   └── daily_report.html
 │
 └── _scripts/                  سكربتات Node.js و Windows
     ├── build_day.js
