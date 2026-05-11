@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1e40af">
+  <title>التقرير اليومي — English Learning System</title>
+  <meta name="description" content="نموذج التقرير اليومي بهيكلة الدروس الجديدة">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="../shared/styles.css">
+</head>
+
+<body>
+
+  <header class="header" role="banner">
+    <div class="container header-inner">
+      <h1 class="header-title"><strong>التقرير اليومي</strong></h1>
+      <nav>
+        <a href="../index.html" class="btn-tertiary">العودة للوحة التحكّم</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container main-content" role="main">
+
+    <section class="section">
+      <h2>عن هذا النموذج</h2>
+      <p style="margin-bottom:0">
+        عبّي حقول هذا التقرير في نهاية اليوم، ثمّ ولّد Markdown منسَّق للصق في Claude/ChatGPT أو الاحتفاظ به كأرشيف.
+        البيانات تُحفَظ تلقائياً في المتصفّح حتى لو أغلقت الصفحة.
+      </p>
+    </section>
+
+    <form class="report-form" id="reportForm" autocomplete="off">
+
+      <section class="section" aria-labelledby="rep-day">
+        <h2 id="rep-day">معلومات اليوم</h2>
+        <div class="field-grid">
+          <div class="field-row">
+            <label for="week">الأسبوع (1-36)</label>
+            <input type="number" id="week" min="1" max="36" value="1" required>
+          </div>
+          <div class="field-row">
+            <label for="day">اليوم (1-7)</label>
+            <input type="number" id="day" min="1" max="7" value="1" required>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field-row">
+            <label for="date">التاريخ</label>
+            <input type="date" id="date" required>
+          </div>
+          <div class="field-row">
+            <label for="dayOfWeek">اليوم في الأسبوع</label>
+            <select id="dayOfWeek">
+              <option>الأحد</option><option>الإثنين</option><option>الثلاثاء</option>
+              <option>الأربعاء</option><option>الخميس</option><option>الجمعة</option><option>السبت</option>
+            </select>
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <button type="button" id="loadBtn" class="btn-secondary">تحميل البيانات المحفوظة من الدرس</button>
+          <span id="loadStatus" class="text-muted" style="margin-inline-start:12px;font-size:0.9rem"></span>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-times">
+        <h2 id="rep-times">الأوقات الفعليّة</h2>
+        <div class="field-grid">
+          <div class="field-row">
+            <label for="minutesCar">السيّارة (دقيقة)</label>
+            <input type="number" id="minutesCar" min="0" max="600" placeholder="0">
+          </div>
+          <div class="field-row">
+            <label for="minutesHome">البيت (دقيقة)</label>
+            <input type="number" id="minutesHome" min="0" max="600" placeholder="0">
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-why">
+        <h2 id="rep-why">WHY — لماذا اليوم</h2>
+        <div class="field-row">
+          <label for="why_notes">ملاحظاتك على السيناريو الافتتاحي</label>
+          <textarea id="why_notes" rows="3" placeholder="ما النقطة الأهمّ التي فهمتها؟"></textarea>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-hook">
+        <h2 id="rep-hook">HOOK — الفخّ الشائع</h2>
+        <div class="field-row">
+          <label for="hook_notes">الفخّ الذي وقعت فيه (أو تجنّبته)</label>
+          <textarea id="hook_notes" rows="3"></textarea>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-podcast">
+        <h2 id="rep-podcast">PODCAST — البودكاست</h2>
+        <div class="field-row">
+          <label for="podcast_episode">اسم الحلقة</label>
+          <input type="text" id="podcast_episode">
+        </div>
+        <div class="field-row">
+          <label for="podcast_topic">1. الموضوع الرئيسي (بالإنجليزية)</label>
+          <textarea id="podcast_topic" rows="3"></textarea>
+        </div>
+        <div class="field-row">
+          <label for="podcast_words">2. كلمات جديدة</label>
+          <textarea id="podcast_words" rows="3"></textarea>
+        </div>
+        <div class="field-row">
+          <label for="podcast_opinion">3. رأيك (3 جمل)</label>
+          <textarea id="podcast_opinion" rows="3"></textarea>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-grammar">
+        <h2 id="rep-grammar">GRAMMAR — القاعدة + تمارينها</h2>
+        <div class="field-row">
+          <label for="grammar_target">القاعدة المستهدفة</label>
+          <input type="text" id="grammar_target">
+        </div>
+        <div class="field-row">
+          <label for="grammar_answers">إجابات تمارين القاعدة (MCQ + Fill-blank)</label>
+          <textarea id="grammar_answers" rows="6"></textarea>
+        </div>
+        <div class="field-row">
+          <label for="grammar_sentences">3 جمل تطبيقيّة من عندك</label>
+          <textarea id="grammar_sentences" rows="3"></textarea>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-spelling">
+        <h2 id="rep-spelling">SPELLING + تمارينها</h2>
+        <div class="field-row">
+          <label for="spelling_answers">إجابات تمارين Spelling</label>
+          <textarea id="spelling_answers" rows="4"></textarea>
+        </div>
+        <div class="field-row">
+          <label for="spelling_errors">أخطاء إملائيّة اكتشفتها في كتاباتك اليوم</label>
+          <textarea id="spelling_errors" rows="3" placeholder="مثال: كتبت 'writeing' الصحيح 'writing'"></textarea>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-reading">
+        <h2 id="rep-reading">READING — القراءة</h2>
+        <div class="field-row">
+          <label for="reading_link">رابط القصّة (إن كان مختلفاً)</label>
+          <input type="text" id="reading_link">
+        </div>
+        <div class="field-row">
+          <label for="reading_words">5 كلمات جديدة + الترجمة</label>
+          <textarea id="reading_words" rows="4"></textarea>
+        </div>
+        <div class="field-row">
+          <label for="reading_hard_spelling">3 كلمات بإملاء صعب</label>
+          <textarea id="reading_hard_spelling" rows="2" placeholder="مثال: receive, separate, accommodate"></textarea>
+        </div>
+        <div class="field-row">
+          <label for="reading_summary">ملخّص بسطرين</label>
+          <textarea id="reading_summary" rows="2"></textarea>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-pron">
+        <h2 id="rep-pron">PRONUNCIATION — النطق</h2>
+        <label class="section-checkbox" style="margin-bottom:12px">
+          <input type="checkbox" id="pron_shadowing">
+          <span>أنهيت Shadowing (10+ دقائق)</span>
+        </label>
+        <div class="field-row">
+          <label for="pron_struggle">كلمات / جمل صعبة</label>
+          <textarea id="pron_struggle" rows="3"></textarea>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-chatgpt">
+        <h2 id="rep-chatgpt">CHATGPT — محادثة صوتيّة</h2>
+        <div class="field-row">
+          <label for="chatgpt_json">JSON من ChatGPT (الصق كاملاً)</label>
+          <textarea id="chatgpt_json" rows="8" style="font-family:var(--font-mono); direction:ltr; text-align:left"
+            placeholder='{"overall": ..., "fluency": ..., "errors": [...], "strengths": [...]}'></textarea>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-writing">
+        <h2 id="rep-writing">WRITING — الكتابة</h2>
+        <div class="field-grid">
+          <div class="field-row">
+            <label for="writing_target">عدد الكلمات المستهدف</label>
+            <input type="number" id="writing_target" min="0" max="2000" placeholder="50">
+          </div>
+          <div class="field-row">
+            <label for="writing_actual">عدد الكلمات الفعلي</label>
+            <input type="number" id="writing_actual" min="0" max="2000" placeholder="—">
+          </div>
+        </div>
+        <div class="field-row">
+          <label for="writing_text">النص الكامل</label>
+          <textarea id="writing_text" rows="8"></textarea>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-mintdeck">
+        <h2 id="rep-mintdeck">MINTDECK</h2>
+        <div class="field-grid">
+          <div class="field-row">
+            <label for="mintdeck_added">كلمات أُضيفت اليوم</label>
+            <input type="number" id="mintdeck_added" min="0" max="500" placeholder="0">
+          </div>
+          <div class="field-row">
+            <label for="mintdeck_reviewed">كلمات روجعت اليوم</label>
+            <input type="number" id="mintdeck_reviewed" min="0" max="500" placeholder="0">
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-rating">
+        <h2 id="rep-rating">التقييم الذاتي</h2>
+        <div class="field-grid">
+          <div class="field-row">
+            <label for="rating_difficulty">صعوبة اليوم (1-10)</label>
+            <input type="number" id="rating_difficulty" min="1" max="10">
+          </div>
+          <div class="field-row">
+            <label for="rating_productivity">إنتاجيّتك (1-10)</label>
+            <input type="number" id="rating_productivity" min="1" max="10">
+          </div>
+          <div class="field-row">
+            <label for="rating_confidence">ثقة الكتابة (1-10)</label>
+            <input type="number" id="rating_confidence" min="1" max="10">
+          </div>
+        </div>
+      </section>
+
+      <section class="section" aria-labelledby="rep-extra">
+        <h2 id="rep-extra">ملاحظات إضافيّة</h2>
+        <div class="field-row">
+          <label for="extra_notes">أيّ شيء آخر تريد توثيقه؟</label>
+          <textarea id="extra_notes" rows="4"></textarea>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>توليد التقرير</h2>
+        <div class="export-actions">
+          <button type="button" id="generateBtn" class="btn-primary">أنشئ التقرير</button>
+          <button type="button" id="copyBtn" class="btn-secondary" disabled>انسخ Markdown</button>
+          <button type="button" id="downloadBtn" class="btn-tertiary" disabled>تنزيل .md</button>
+        </div>
+        <div style="margin-top:16px">
+          <button type="button" id="resetBtn" class="btn-danger">مسح كل الحقول</button>
+        </div>
+      </section>
+
+    </form>
+
+    <section class="section" id="outputSection" hidden>
+      <h2>المعاينة</h2>
+      <pre class="report-output" id="reportOutput" aria-live="polite"></pre>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>English Learning System · التقرير اليومي</p>
+    </div>
+  </footer>
+
+  <script src="../shared/storage.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      const FORM_STATE_KEY = 'daily_report_form';
+
+      const FIELDS = [
+        'week', 'day', 'date', 'dayOfWeek',
+        'minutesCar', 'minutesHome',
+        'why_notes', 'hook_notes',
+        'podcast_episode', 'podcast_topic', 'podcast_words', 'podcast_opinion',
+        'grammar_target', 'grammar_answers', 'grammar_sentences',
+        'spelling_answers', 'spelling_errors',
+        'reading_link', 'reading_words', 'reading_hard_spelling', 'reading_summary',
+        'pron_shadowing', 'pron_struggle',
+        'chatgpt_json',
+        'writing_target', 'writing_actual', 'writing_text',
+        'mintdeck_added', 'mintdeck_reviewed',
+        'rating_difficulty', 'rating_productivity', 'rating_confidence',
+        'extra_notes'
+      ];
+
+      const $ = (id) => document.getElementById(id);
+
+      function readField(id) {
+        const el = $(id);
+        if (!el) return '';
+        if (el.type === 'checkbox') return el.checked;
+        return el.value;
+      }
+      function writeField(id, val) {
+        const el = $(id);
+        if (!el) return;
+        if (el.type === 'checkbox') el.checked = !!val;
+        else el.value = (val === null || val === undefined) ? '' : String(val);
+      }
+
+      function saveForm() {
+        const state = {};
+        FIELDS.forEach(id => { state[id] = readField(id); });
+        try { localStorage.setItem(FORM_STATE_KEY, JSON.stringify(state)); } catch (e) { /* quota */ }
+      }
+      function loadForm() {
+        try {
+          const raw = localStorage.getItem(FORM_STATE_KEY);
+          if (!raw) return;
+          const state = JSON.parse(raw);
+          FIELDS.forEach(id => { if (state[id] !== undefined) writeField(id, state[id]); });
+        } catch (e) { /* ignore corrupt */ }
+      }
+      function resetForm() {
+        if (!confirm('مسح كل الحقول؟ هذا الإجراء لا يمكن التراجع عنه.')) return;
+        FIELDS.forEach(id => {
+          const el = $(id);
+          if (!el) return;
+          if (el.type === 'checkbox') el.checked = false;
+          else el.value = '';
+        });
+        localStorage.removeItem(FORM_STATE_KEY);
+        $('date').value = todayISO();
+        $('outputSection').hidden = true;
+        $('copyBtn').disabled = true;
+        $('downloadBtn').disabled = true;
+      }
+
+      function todayISO() { return new Date().toISOString().slice(0, 10); }
+
+      // Pull data from the lesson page's localStorage (via Storage module)
+      function loadFromLesson() {
+        const w = Number($('week').value);
+        const d = Number($('day').value);
+        const status = $('loadStatus');
+        if (!w || !d) { status.textContent = 'أرقام غير صالحة'; return; }
+        if (!window.Storage) { status.textContent = 'storage.js غير محمَّل'; return; }
+
+        let touched = 0;
+
+        // Writing: concat all freewriting blocks
+        const writing = window.Storage.load(w, d, 'writing');
+        if (writing && typeof writing === 'object') {
+          const parts = Object.keys(writing).map(k => writing[k]).filter(Boolean);
+          if (parts.length) {
+            $('writing_text').value = parts.join('\n\n');
+            // Word count
+            const words = parts.join(' ').trim().split(/\s+/).filter(Boolean).length;
+            $('writing_actual').value = words;
+            touched++;
+          }
+        } else if (typeof writing === 'string' && writing) {
+          $('writing_text').value = writing;
+          touched++;
+        }
+
+        // ChatGPT JSON
+        const cg = window.Storage.load(w, d, 'chatgpt_json');
+        if (typeof cg === 'string' && cg) {
+          $('chatgpt_json').value = cg;
+          touched++;
+        }
+
+        // MCQ answers → grammar_answers (as JSON)
+        const mcq = window.Storage.load(w, d, 'mcq_answers');
+        const fb = window.Storage.load(w, d, 'fillblank_answers');
+        const summary = [];
+        if (mcq && Object.keys(mcq).length) summary.push('MCQ: ' + JSON.stringify(mcq));
+        if (fb && Object.keys(fb).length) {
+          const fbSimple = {};
+          Object.keys(fb).forEach(k => { fbSimple[k] = (fb[k] && fb[k].value) || ''; });
+          summary.push('Fill-blank: ' + JSON.stringify(fbSimple));
+        }
+        if (summary.length && !$('grammar_answers').value.trim()) {
+          $('grammar_answers').value = summary.join('\n');
+          touched++;
+        }
+
+        status.textContent = touched > 0
+          ? 'استُورد ' + touched + ' حقل من بيانات الدرس'
+          : 'لا توجد بيانات محفوظة لهذا اليوم';
+
+        saveForm();
+      }
+
+      function v(id) {
+        const raw = readField(id);
+        if (typeof raw === 'boolean') return raw ? '[x]' : '[ ]';
+        return String(raw || '').trim();
+      }
+
+      function generateReport() {
+        const w = v('week');
+        const d = v('day');
+        const date = v('date') || todayISO();
+        const carM = parseInt(v('minutesCar'), 10) || 0;
+        const homeM = parseInt(v('minutesHome'), 10) || 0;
+        const totalM = carM + homeM;
+
+        const lines = [];
+        lines.push('# تقرير اليوم — أسبوع ' + w + ' / يوم ' + d);
+        lines.push('');
+        lines.push('- **التاريخ:** ' + date + ' (' + v('dayOfWeek') + ')');
+        lines.push('- **المدّة:** سيّارة ' + carM + ' دقيقة + بيت ' + homeM + ' دقيقة = **' + totalM + ' دقيقة**');
+        lines.push('');
+
+        function block(title, body) {
+          if (!body || !body.trim()) return;
+          lines.push('## ' + title);
+          lines.push(body);
+          lines.push('');
+        }
+
+        block('WHY — لماذا اليوم', v('why_notes'));
+        block('HOOK — الفخّ الشائع', v('hook_notes'));
+
+        if (v('podcast_episode') || v('podcast_topic') || v('podcast_words') || v('podcast_opinion')) {
+          lines.push('## PODCAST');
+          if (v('podcast_episode')) lines.push('**الحلقة:** ' + v('podcast_episode'));
+          if (v('podcast_topic'))   lines.push('\n**1. الموضوع:**\n' + v('podcast_topic'));
+          if (v('podcast_words'))   lines.push('\n**2. كلمات جديدة:**\n' + v('podcast_words'));
+          if (v('podcast_opinion')) lines.push('\n**3. الرأي:**\n' + v('podcast_opinion'));
+          lines.push('');
+        }
+
+        if (v('grammar_target') || v('grammar_answers') || v('grammar_sentences')) {
+          lines.push('## GRAMMAR');
+          if (v('grammar_target'))    lines.push('**القاعدة:** ' + v('grammar_target'));
+          if (v('grammar_answers'))   lines.push('\n**إجابات التمارين:**\n' + v('grammar_answers'));
+          if (v('grammar_sentences')) lines.push('\n**3 جمل تطبيقيّة:**\n' + v('grammar_sentences'));
+          lines.push('');
+        }
+
+        if (v('spelling_answers') || v('spelling_errors')) {
+          lines.push('## SPELLING');
+          if (v('spelling_answers')) lines.push('**إجابات التمارين:**\n' + v('spelling_answers'));
+          if (v('spelling_errors'))  lines.push('\n**أخطاء اكتشفتها:**\n' + v('spelling_errors'));
+          lines.push('');
+        }
+
+        if (v('reading_link') || v('reading_words') || v('reading_hard_spelling') || v('reading_summary')) {
+          lines.push('## READING');
+          if (v('reading_link'))          lines.push('**الرابط:** ' + v('reading_link'));
+          if (v('reading_words'))         lines.push('\n**كلمات + ترجمة:**\n' + v('reading_words'));
+          if (v('reading_hard_spelling')) lines.push('\n**كلمات صعبة إملائياً:** ' + v('reading_hard_spelling'));
+          if (v('reading_summary'))       lines.push('\n**الملخّص:** ' + v('reading_summary'));
+          lines.push('');
+        }
+
+        if (v('pron_struggle') || readField('pron_shadowing')) {
+          lines.push('## PRONUNCIATION');
+          lines.push('- Shadowing مكتمل: ' + v('pron_shadowing'));
+          if (v('pron_struggle')) lines.push('- كلمات صعبة: ' + v('pron_struggle'));
+          lines.push('');
+        }
+
+        if (v('chatgpt_json')) {
+          lines.push('## CHATGPT JSON');
+          lines.push('```json');
+          lines.push(v('chatgpt_json'));
+          lines.push('```');
+          lines.push('');
+        }
+
+        if (v('writing_text') || v('writing_target') || v('writing_actual')) {
+          lines.push('## WRITING');
+          const tgt = v('writing_target'), act = v('writing_actual');
+          if (tgt || act) lines.push('**الكلمات:** ' + (act || '—') + ' من ' + (tgt || '—'));
+          if (v('writing_text')) {
+            lines.push('\n**النص:**');
+            lines.push(v('writing_text'));
+          }
+          lines.push('');
+        }
+
+        if (v('mintdeck_added') || v('mintdeck_reviewed')) {
+          lines.push('## MINTDECK');
+          lines.push('- مُضاف: ' + (v('mintdeck_added') || '0'));
+          lines.push('- مُراجَع: ' + (v('mintdeck_reviewed') || '0'));
+          lines.push('');
+        }
+
+        if (v('rating_difficulty') || v('rating_productivity') || v('rating_confidence')) {
+          lines.push('## التقييم الذاتي');
+          lines.push('- صعوبة: ' + (v('rating_difficulty') || '—') + ' / 10');
+          lines.push('- إنتاجيّة: ' + (v('rating_productivity') || '—') + ' / 10');
+          lines.push('- ثقة الكتابة: ' + (v('rating_confidence') || '—') + ' / 10');
+          lines.push('');
+        }
+
+        if (v('extra_notes')) {
+          lines.push('## ملاحظات إضافيّة');
+          lines.push(v('extra_notes'));
+          lines.push('');
+        }
+
+        return lines.join('\n').trim();
+      }
+
+      function showOutput(md) {
+        $('reportOutput').textContent = md;
+        $('outputSection').hidden = false;
+        $('copyBtn').disabled = false;
+        $('downloadBtn').disabled = false;
+        $('outputSection').scrollIntoView({ behavior: 'smooth' });
+      }
+
+      function copyReport() {
+        const txt = $('reportOutput').textContent;
+        if (!txt) return;
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(txt).then(
+            () => { $('copyBtn').textContent = 'نُسخ!'; setTimeout(() => $('copyBtn').textContent = 'انسخ Markdown', 2000); },
+            () => alert('فشل النسخ — حدّد النص يدوياً')
+          );
+        }
+      }
+
+      function downloadReport() {
+        const txt = $('reportOutput').textContent;
+        if (!txt) return;
+        const w = v('week'), d = v('day'), date = v('date') || todayISO();
+        const blob = new Blob([txt], { type: 'text/markdown;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'report_w' + w + '_d' + d + '_' + date + '.md';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      // ---- init ----
+      function init() {
+        // attach auto-save
+        FIELDS.forEach(id => {
+          const el = $(id);
+          if (!el) return;
+          el.addEventListener('input', saveForm);
+          el.addEventListener('change', saveForm);
+        });
+        loadForm();
+        if (!$('date').value) $('date').value = todayISO();
+
+        $('loadBtn').addEventListener('click', loadFromLesson);
+        $('generateBtn').addEventListener('click', () => showOutput(generateReport()));
+        $('copyBtn').addEventListener('click', copyReport);
+        $('downloadBtn').addEventListener('click', downloadReport);
+        $('resetBtn').addEventListener('click', resetForm);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
+  </script>
+</body>
+</html>
