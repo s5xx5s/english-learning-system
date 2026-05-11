@@ -1,0 +1,13 @@
+{
+  "name": "english-learning-system",
+  "version": "1.0.0",
+  "description": "9-month interactive English learning platform",
+  "scripts": {
+    "build:day": "node _scripts/build_day.js",
+    "build:week": "node _scripts/build_week.js"
+  },
+  "dependencies": {
+    "marked": "^12.0.0",
+    "gray-matter": "^4.0.3"
+  }
+}
