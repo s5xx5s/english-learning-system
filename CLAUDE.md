@@ -227,13 +227,43 @@ english-learning-system/
 - لا تُكرّر JavaScript في كل صفحة
 - لا تستخدم frameworks (React, Vue, etc.) — vanilla JS فقط
 - لا تستخدم Tailwind أو أيّ CSS framework
-- لا تستخدم CDN خارجي إلا لـ Google Fonts
-- لا تستخدم localStorage للبيانات الحسّاسة
+- لا تستخدم CDN خارجي إلا لـ Google Fonts **+ استثناءات v2 أدناه**
+- لا تستخدم localStorage للبيانات الحسّاسة (استخدم Supabase بدلاً)
 - لا تُغيّر بنية المجلدات
 - لا تُضف Gamification (نقاط، شارات)
 - لا تتعدّى 75 KB لأيّ ملف HTML
 - لا تعدّل ملفّات في content/ — هي مسؤولية المدرّس
 - لا تعدّل ملفّات في weeks/ يدوياً — هي مُولَّدة
+
+---
+
+## استثناءات v2 (Phase 1 + 6) — مأذون بها
+
+موافقة صريحة من المستخدم (2026-05-12). راجع `BUILD_PLAN.md` و `TOOLS_SPEC.md`.
+
+### CDN مسموح
+- `https://esm.sh/@supabase/supabase-js@2` — Supabase JS client
+- `https://esm.sh/idb@8` — IndexedDB wrapper
+- `https://api.languagetool.org/v2/check` — LanguageTool free tier
+- (Google Fonts ما زال مسموحاً كما هو)
+
+### مجلّدات v2 الجديدة
+- `assets/js/` — وحدات JS تعمل عبر ESM CDN (config, supabase-client, languagetool, pwa-register, indexeddb-sync, notifications, import-chatgpt-json)
+- `test/` — صفحات اختبار مستقلّة لا تظهر في صفحات الدروس
+- `supabase/migrations/` — SQL migrations (ينسخها المستخدم في Supabase SQL Editor)
+- `icons/` — أيقونات PWA
+- `manifest.json`, `service-worker.js`, `offline.html` — في الجذر
+
+### حماية المفاتيح
+- `SUPABASE_ANON_KEY` آمن في `assets/js/config.js` (مُرفَع لـ GitHub) — RLS هي الحماية الفعليّة
+- `SUPABASE_SERVICE_KEY` ممنوع في أيّ ملفّ يُرفَع لـ GitHub — يبقى في `.env.local` فقط
+- `.env.local`, `supabase/seed.sql`, `assets/js/config.local.js` كلّها في `.gitignore`
+
+### لا يتأثّر
+- `_scripts/build_day.js` يبقى vanilla Node (لا Supabase imports هناك)
+- `templates/lesson_template.html` يكسب 3 أسطر فقط في `<head>` لـ PWA (manifest + apple-touch-icon + pwa-register)
+- محتوى MD في `content/` غير متأثّر
+- localStorage ما زال يُستخدَم للمسوّدات والـ session state — Supabase للبيانات الدائمة فقط
 
 ---
 
