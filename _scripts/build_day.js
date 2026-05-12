@@ -23,7 +23,7 @@ const { marked } = require('marked');
 const ROOT = path.join(__dirname, '..');
 
 const SECTION_IDS = [
-  'PODCAST_INSTRUCTIONS',
+  'PODCAST',
   'WHY', 'HOOK',
   'GRAMMAR', 'GRAMMAR_EXERCISES', 'GRAMMAR_MINI_REVIEW',
   'SPELLING', 'SPELLING_EXERCISES', 'READING',
@@ -666,7 +666,7 @@ function buildDay(weekArg, dayArg) {
 
     '{{SUCCESS_CRITERIA}}': buildSuccessChecklist(data.success_criteria),
 
-    '{{PODCAST_INSTRUCTIONS}}':       sectionsHtml.PODCAST_INSTRUCTIONS,
+    '{{PODCAST_INSTRUCTIONS}}':       sectionsHtml.PODCAST,
     '{{WHY_SECTION}}':                sectionsHtml.WHY,
     '{{HOOK_SECTION}}':               sectionsHtml.HOOK,
     '{{GRAMMAR_SECTION}}':            sectionsHtml.GRAMMAR,
