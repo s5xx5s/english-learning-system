@@ -365,6 +365,35 @@ textarea { resize: vertical; min-height: 100px; font-family: inherit; line-heigh
 .callout + .callout { margin-top: var(--space-4); }
 .section-body > * + * { margin-top: var(--space-3); }
 
+/* Bullet items containing mixed Arabic + English (e.g. "3rd person singular
+   مع -s/-es/-ies") get plaintext bidi so their direction is auto-derived
+   from the first strong character. Without this, bidi reorders multi-script
+   bullets in confusing ways. */
+li { unicode-bidi: plaintext; }
+/* Restore strict isolation for explicitly-marked English inside list items. */
+li .en { unicode-bidi: isolate; direction: ltr; }
+
+/* Quoted English (e.g. &quot;is working&quot;) renders italic + accented
+   so the reader can tell it's a quotation from teacher commentary. */
+.en-quoted {
+  font-style: italic;
+  color: var(--primary-dark);
+}
+
+/* Long quoted English (3+ words ending with .!?) gets promoted to a block
+   so it gets its own line, visually separated from surrounding Arabic prose.
+   The selector is more specific than `.en` so `display: block` wins over
+   `.en { display: inline-block }`. */
+.en.en-block {
+  display: block;
+  margin: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-accent);
+  border-inline-start: 3px solid var(--primary-light);
+  border-radius: var(--radius-sm);
+  font-style: italic;
+}
+
 /* 11. MCQ ------------------------------------------------------------- */
 .mcq-block {
   background: var(--bg-secondary);
@@ -424,16 +453,23 @@ textarea { resize: vertical; min-height: 100px; font-family: inherit; line-heigh
   font-size: 1.05rem;
   line-height: 2;
   margin-bottom: var(--space-3);
+  direction: ltr;
+  text-align: start;
 }
-.fillblank-input {
+/* `input.fillblank-input` selector raises specificity above the generic
+   `input[type="text"] { width: 100% }` rule earlier in this file so the
+   blank stays inline at its natural size instead of stretching full-width. */
+input.fillblank-input {
   display: inline-block;
   width: auto;
-  min-width: 100px;
+  min-width: 120px;
+  max-width: 200px;
   margin-inline: var(--space-1);
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-1) var(--space-3);
   text-align: center;
   font-family: var(--font-en);
   direction: ltr;
+  vertical-align: baseline;
 }
 .fillblank-input.is-correct {
   border-color: var(--success);

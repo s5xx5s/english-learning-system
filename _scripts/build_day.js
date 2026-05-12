@@ -125,16 +125,43 @@ function wrapInlineEnglish(html) {
   // Optional trailing punctuation so phrases can end at "manager." or "ready!".
   const TAIL = '[A-Za-z0-9.!?,’)\\]]?';
 
+  // Two alternatives combined into one regex:
+  //   (A) QUOTED:   quote + 1+ words (separated by SEP) + quote.
+  //                 Allows single-word quoted phrases like &quot;hi&quot;.
+  //   (B) UNQUOTED: 2+ words.
   // Lookbehind: not preceded by < (inside tag) or word char (mid-word).
   // & is intentionally NOT excluded — phrase may START at &quot;.
   const PHRASE_RE = new RegExp(
-    '(?<![<\\w])(' + QUOTE + '?' +
+    '(?<![<\\w])(' +
+      // Case A
+      QUOTE +
+      '[A-Za-z][A-Za-z0-9’\'\\-]*' +
+      '(?:' + SEP + '+' + WORD + ')*' +
+      '[A-Za-z0-9.!?,]?' +
+      QUOTE +
+    '|' +
+      // Case B
       '[A-Za-z][A-Za-z0-9’\'\\-]*' +
       '(?:' + SEP + '+' + WORD + ')+' +
-      TAIL + QUOTE + '?' +
+      TAIL +
     ')(?![\\w>])',
     'g'
   );
+
+  // Helpers to decide which CSS classes to attach to each wrap.
+  const QUOTE_EDGE_RE = /(?:&quot;|&#39;|["'‘’“”])/;
+  function isQuoted(t) {
+    return new RegExp('^' + QUOTE_EDGE_RE.source).test(t) &&
+           new RegExp(QUOTE_EDGE_RE.source + '$').test(t);
+  }
+  function countWords(t) {
+    // Replace HTML entities with space, then split on whitespace.
+    const plain = t.replace(/&(?:quot|#39|amp|lt|gt|nbsp);/g, ' ').trim();
+    return plain.split(/\s+/).filter(Boolean).length;
+  }
+  function endsInTerminal(t) {
+    return /[.!?](?:&quot;|&#39;|["'‘’“”])?$/.test(t);
+  }
 
   return html.replace(
     /(<(p|li|blockquote)\b[^>]*>)([\s\S]*?)(<\/\2>)/g,
@@ -145,7 +172,14 @@ function wrapInlineEnglish(html) {
         const lt = content.indexOf('<', i);
         const chunk = (lt === -1) ? content.slice(i) : content.slice(i, lt);
         if (chunk.length) {
-          out += chunk.replace(PHRASE_RE, '<span dir="ltr" class="en">$1</span>');
+          out += chunk.replace(PHRASE_RE, (match, captured) => {
+            const quoted = isQuoted(captured);
+            const longTerm = countWords(captured) >= 3 && endsInTerminal(captured);
+            let cls = 'en';
+            if (quoted)  cls += ' en-quoted';
+            if (longTerm) cls += ' en-block';
+            return '<span dir="ltr" class="' + cls + '">' + captured + '</span>';
+          });
         }
         if (lt === -1) break;
 
@@ -394,21 +428,40 @@ function splitIntoSections(mdBody) {
   const result = {};
   SECTION_IDS.forEach(id => { result[id] = ''; });
 
-  // Find section headers: "## ID" or "## <icon> ID". The icon (any non-space token)
-  // before the ID is optional, so both formats work.
-  const re = /^##\s+(?:\S+\s+)?([A-Z_]+)\s*$/gm;
-  const matches = [];
+  // Find ALL H2 headings (any text after `## `). Recognized SECTION_IDs
+  // produce real section content; unrecognized headings still act as
+  // BOUNDARIES so their content can never leak into the previous section.
+  // Unrecognized headings + their content are dropped from output (with a
+  // console warning so the teacher knows).
+  const ANY_H2 = /^##\s+(.+?)\s*$/gm;
+  const ID_RE  = /^(?:\S+\s+)?([A-Z_]+)$/;
+
+  const allHeadings = [];
   let m;
-  while ((m = re.exec(mdBody)) !== null) {
-    if (SECTION_IDS.indexOf(m[1]) !== -1) {
-      matches.push({ id: m[1], start: m.index, headerEnd: m.index + m[0].length });
-    }
+  while ((m = ANY_H2.exec(mdBody)) !== null) {
+    const idMatch = m[1].match(ID_RE);
+    const sectionId = (idMatch && SECTION_IDS.indexOf(idMatch[1]) !== -1) ? idMatch[1] : null;
+    allHeadings.push({
+      heading: m[1],
+      sectionId,
+      start: m.index,
+      headerEnd: m.index + m[0].length
+    });
   }
 
-  for (let i = 0; i < matches.length; i++) {
-    const contentStart = matches[i].headerEnd;
-    const contentEnd = (i + 1 < matches.length) ? matches[i + 1].start : mdBody.length;
-    result[matches[i].id] = mdBody.slice(contentStart, contentEnd).trim();
+  for (let i = 0; i < allHeadings.length; i++) {
+    if (!allHeadings[i].sectionId) continue;
+    const contentStart = allHeadings[i].headerEnd;
+    const contentEnd = (i + 1 < allHeadings.length)
+      ? allHeadings[i + 1].start
+      : mdBody.length;
+    result[allHeadings[i].sectionId] = mdBody.slice(contentStart, contentEnd).trim();
+  }
+
+  const unknown = allHeadings.filter(h => !h.sectionId);
+  if (unknown.length) {
+    console.warn('  WARNING: تم تجاهل ' + unknown.length + ' عنوان H2 غير معروف (محتواها لن يُعرَض):');
+    unknown.forEach(h => console.warn('    "## ' + h.heading + '"'));
   }
 
   return result;
