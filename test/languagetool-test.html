@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>اختبار LanguageTool</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <style>
+    .lt-match {
+      padding: var(--space-3);
+      margin-bottom: var(--space-2);
+      border-inline-start: 3px solid var(--warning);
+      background: var(--warning-bg);
+      border-radius: var(--radius-sm);
+      unicode-bidi: plaintext;
+    }
+    .lt-match-meta {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: var(--space-1);
+    }
+    .lt-match-wrong   { color: var(--error); text-decoration: line-through; }
+    .lt-match-correct { color: var(--success); font-weight: 600; }
+    .lt-match-arrow   { color: var(--text-muted); }
+    .lt-match-rule    { font-size: 0.85rem; color: var(--text-secondary); margin-top: var(--space-1); }
+  </style>
+</head>
+<body>
+  <main class="container main-content" role="main">
+    <section class="section">
+      <h1>اختبار LanguageTool</h1>
+      <p class="text-muted mb-4">
+        اكتب نصّاً إنجليزياً واضغط "فحص". تظهر الأخطاء بترتيبها داخل النصّ.
+        زرّ "احفظ في errors" يُسجّلها في Supabase (يتطلّب تسجيل دخول في
+        <a href="./supabase-test.html">supabase-test.html</a> أوّلاً).
+      </p>
+
+      <div class="field-group">
+        <label for="textIn" class="field-label">النصّ الإنجليزي</label>
+        <textarea id="textIn" rows="6" dir="ltr"
+                  placeholder="He don't like coffee. She watch TV every night.">He don't like coffee. She watch TV every night.</textarea>
+      </div>
+
+      <div class="export-actions">
+        <button type="button" id="checkBtn" class="btn-primary">فحص</button>
+        <button type="button" id="saveBtn" class="btn-secondary" disabled>احفظ كل الأخطاء في <code>errors</code></button>
+      </div>
+
+      <div id="status" class="text-muted mt-4"></div>
+
+      <h2 class="mt-6">الأخطاء المكتشَفة</h2>
+      <div id="matches"></div>
+
+      <h2 class="mt-6">الـ payloads التي ستُحفَظ</h2>
+      <pre id="payloadOut" class="mintdeck-tsv" style="max-height:200px;"></pre>
+
+      <h2 class="mt-6">نتيجة الحفظ</h2>
+      <pre id="saveOut" class="mintdeck-tsv" style="max-height:200px;"></pre>
+    </section>
+  </main>
+
+  <script type="module">
+    import { checkText, extractErrorsForLog } from '../assets/js/languagetool.js';
+    import { logError, currentUser, isConfigured } from '../assets/js/supabase-client.js';
+
+    const $ = (id) => document.getElementById(id);
+    let lastPayloads = [];
+
+    $('checkBtn').addEventListener('click', async () => {
+      const text = $('textIn').value.trim();
+      if (!text) { $('status').textContent = 'النصّ فارغ.'; return; }
+      $('status').textContent = 'جارٍ الفحص...';
+      $('matches').innerHTML = '';
+      $('payloadOut').textContent = '';
+      $('saveOut').textContent = '';
+      $('saveBtn').disabled = true;
+
+      try {
+        const result = await checkText(text);
+        const matches = result.matches || [];
+        $('status').textContent =
+          matches.length === 0
+            ? 'لا توجد أخطاء.'
+            : matches.length + ' خطأ مكتشَف.';
+
+        // render each match
+        matches.forEach(m => {
+          const wrong = text.slice(m.offset, m.offset + m.length);
+          const suggestion = (m.replacements && m.replacements[0] && m.replacements[0].value) || '—';
+          const div = document.createElement('div');
+          div.className = 'lt-match';
+          div.innerHTML = `
+            <div class="lt-match-meta">
+              نوع: <strong>${m.rule && m.rule.category ? m.rule.category.name : '?'}</strong>
+              · القاعدة: <code>${m.rule ? m.rule.id : '?'}</code>
+            </div>
+            <div>
+              <span class="lt-match-wrong">${wrong}</span>
+              <span class="lt-match-arrow">→</span>
+              <span class="lt-match-correct">${suggestion}</span>
+            </div>
+            <div class="lt-match-rule">${(m.rule && m.rule.description) || m.message || ''}</div>
+          `;
+          $('matches').appendChild(div);
+        });
+
+        lastPayloads = extractErrorsForLog(matches, text);
+        $('payloadOut').textContent = JSON.stringify(lastPayloads, null, 2);
+
+        // enable save only if connected & signed in
+        if (isConfigured && (await currentUser())) {
+          $('saveBtn').disabled = lastPayloads.length === 0;
+        }
+      } catch (e) {
+        $('status').textContent = 'فشل: ' + e.message;
+      }
+    });
+
+    $('saveBtn').addEventListener('click', async () => {
+      $('saveOut').textContent = '';
+      const log = (line) => { $('saveOut').textContent += line + '\n'; };
+
+      for (const p of lastPayloads) {
+        try {
+          const { row, action } = await logError(p);
+          log(action + ': ' + row.wrong_form + ' → ' + row.correct_form +
+              ' (count=' + row.occurrence_count +
+              ', card_generated=' + row.card_generated + ')');
+        } catch (e) {
+          log('FAILED for "' + p.wrong_form + '": ' + e.message);
+        }
+      }
+      log('--- done ---');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>لوحة الأخطاء — Error Log Dashboard</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+  <style>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+    }
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      text-align: center;
+    }
+    .stat-value { font-size: 2rem; font-weight: 700; color: var(--primary); display: block; }
+    .stat-label { font-size: 0.85rem; color: var(--text-secondary); margin-top: var(--space-1); }
+
+    .filter-row {
+      display: flex; flex-wrap: wrap; gap: var(--space-3);
+      align-items: end; margin-bottom: var(--space-4);
+    }
+    .filter-row label { font-size: 0.85rem; color: var(--text-secondary); }
+
+    .errors-table { width: 100%; border-collapse: collapse; margin-top: var(--space-2); }
+    .errors-table th, .errors-table td {
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      unicode-bidi: plaintext;
+      font-size: 0.9rem;
+    }
+    .errors-table th { background: var(--bg-accent); text-align: start; }
+    .err-wrong   { color: var(--error); }
+    .err-correct { color: var(--success); }
+    .err-badge {
+      display: inline-block;
+      padding: 2px var(--space-2);
+      border-radius: 999px;
+      font-size: 0.75rem;
+      background: var(--bg-accent);
+      color: var(--primary);
+    }
+    .err-badge.is-card { background: var(--success-bg); color: #064e3b; }
+    .err-count { font-weight: 700; }
+  </style>
+</head>
+<body>
+  <main class="container main-content" role="main">
+    <section class="section">
+      <h1>لوحة الأخطاء</h1>
+      <p class="text-muted mb-4">
+        كل الأخطاء قيد التتبّع. حين يبلغ <code>occurrence_count = 3</code>،
+        الـ trigger يولّد بطاقة تلقائياً وتظهر في عمود "بطاقة".
+      </p>
+
+      <div id="configStatus" class="callout callout-info">جارٍ الفحص...</div>
+
+      <h2 class="mt-6">إحصائيّات</h2>
+      <div class="stats-grid">
+        <div class="stat-card"><span class="stat-value" id="statTotal">—</span><div class="stat-label">إجمالي</div></div>
+        <div class="stat-card"><span class="stat-value" id="statTracking">—</span><div class="stat-label">قيد التتبّع (count &lt; 3)</div></div>
+        <div class="stat-card"><span class="stat-value" id="statPromoted">—</span><div class="stat-label">صارت بطاقات</div></div>
+        <div class="stat-card"><span class="stat-value" id="statBySource">—</span><div class="stat-label">من ChatGPT</div></div>
+      </div>
+
+      <h2 class="mt-6">فلاتر</h2>
+      <div class="filter-row">
+        <div>
+          <label for="filterType">نوع الخطأ</label><br>
+          <select id="filterType" dir="ltr">
+            <option value="">(الكلّ)</option>
+            <option value="spelling">spelling</option>
+            <option value="grammar">grammar</option>
+            <option value="punctuation">punctuation</option>
+            <option value="word_choice">word_choice</option>
+            <option value="pronunciation">pronunciation</option>
+            <option value="collocation">collocation</option>
+            <option value="register">register</option>
+          </select>
+        </div>
+        <div>
+          <label for="filterSource">المصدر</label><br>
+          <select id="filterSource" dir="ltr">
+            <option value="">(الكلّ)</option>
+            <option value="chatgpt_json">chatgpt_json</option>
+            <option value="languagetool">languagetool</option>
+            <option value="claude_manual">claude_manual</option>
+            <option value="writing_self_edit">writing_self_edit</option>
+            <option value="pronunciation_recording">pronunciation_recording</option>
+          </select>
+        </div>
+        <div>
+          <label for="filterCard">بطاقة؟</label><br>
+          <select id="filterCard" dir="ltr">
+            <option value="">(الكلّ)</option>
+            <option value="false">قيد التتبّع فقط</option>
+            <option value="true">صارت بطاقات فقط</option>
+          </select>
+        </div>
+        <button type="button" id="reloadBtn" class="btn-secondary">تحديث</button>
+      </div>
+
+      <h2 class="mt-6">الأخطاء</h2>
+      <div id="errorsContainer">
+        <p class="text-muted">سجّل دخول من <a href="./supabase-test.html">supabase-test.html</a> أوّلاً، ثم ارجع.</p>
+      </div>
+
+      <h2 class="mt-6">استيراد ChatGPT JSON</h2>
+      <p class="text-muted">
+        الصق JSON من ChatGPT Voice. يجب أن يكون لديك يومٌ موجود في
+        جدول <code>days</code> أوّلاً — استخدم الـ <code>day_id</code>
+        الموافق له.
+      </p>
+      <div class="field-group">
+        <label for="dayIdIn" class="field-label">day_id (UUID)</label>
+        <input type="text" id="dayIdIn" dir="ltr" placeholder="00000000-0000-0000-0000-000000000000">
+      </div>
+      <div class="field-group">
+        <label for="jsonIn" class="field-label">JSON</label>
+        <textarea id="jsonIn" rows="10" dir="ltr"
+                  placeholder='{"date":"2026-05-12","target_grammar":"Present Simple","errors":[{"my_sentence":"He don\'t like","correction":"He doesn\'t like","type":"grammar","explanation":"3rd person needs doesn\'t"}]}'></textarea>
+      </div>
+      <button type="button" id="importBtn" class="btn-primary">استورد</button>
+      <pre id="importOut" class="mintdeck-tsv" style="max-height:200px;"></pre>
+    </section>
+  </main>
+
+  <script type="module">
+    import { isConfigured, currentUser, getErrors, supabase }
+      from '../assets/js/supabase-client.js';
+    import { importChatGPTReport } from '../assets/js/import-chatgpt-json.js';
+
+    const $ = (id) => document.getElementById(id);
+    let lastRows = [];
+
+    /* ─── config + auth gate ──────────────────────────────────────── */
+    async function status() {
+      const cs = $('configStatus');
+      if (!isConfigured) {
+        cs.className = 'callout callout-warning';
+        cs.textContent = 'config.js لم يُملأ. حدِّث assets/js/config.js.';
+        return false;
+      }
+      const u = await currentUser();
+      if (!u) {
+        cs.className = 'callout callout-warning';
+        cs.innerHTML = 'لا توجد جلسة. <a href="./supabase-test.html">سجّل دخول</a>.';
+        return false;
+      }
+      cs.className = 'callout callout-success';
+      cs.textContent = 'متّصل كـ ' + u.email;
+      return true;
+    }
+
+    /* ─── load + render ───────────────────────────────────────────── */
+    async function load() {
+      if (!(await status())) return;
+      const filter = {};
+      if ($('filterType').value)   filter.error_type = $('filterType').value;
+      if ($('filterSource').value) filter.source     = $('filterSource').value;
+      const cardVal = $('filterCard').value;
+      if (cardVal === 'true' || cardVal === 'false') filter.card_generated = (cardVal === 'true');
+
+      try {
+        lastRows = await getErrors({ filter, limit: 500 });
+      } catch (e) {
+        $('errorsContainer').innerHTML = '<p class="callout callout-error">فشل: ' + e.message + '</p>';
+        return;
+      }
+      renderStats(lastRows);
+      renderTable(lastRows);
+    }
+
+    function renderStats(rows) {
+      $('statTotal').textContent    = rows.length;
+      $('statTracking').textContent = rows.filter(r => !r.card_generated).length;
+      $('statPromoted').textContent = rows.filter(r =>  r.card_generated).length;
+      $('statBySource').textContent = rows.filter(r => r.source === 'chatgpt_json').length;
+    }
+
+    function renderTable(rows) {
+      if (!rows.length) {
+        $('errorsContainer').innerHTML = '<p class="text-muted">لا توجد أخطاء مطابقة.</p>';
+        return;
+      }
+      const html = [
+        '<table class="errors-table">',
+        '<thead><tr>',
+        '<th>الخطأ</th><th>التصحيح</th><th>النوع</th><th>المصدر</th>',
+        '<th>العدّ</th><th>بطاقة؟</th><th>آخر ظهور</th>',
+        '</tr></thead><tbody>'
+      ];
+      for (const r of rows) {
+        html.push('<tr>');
+        html.push('<td class="err-wrong">' + escape(r.wrong_form) + '</td>');
+        html.push('<td class="err-correct">' + escape(r.correct_form) + '</td>');
+        html.push('<td><span class="err-badge">' + escape(r.error_type || '?') + '</span></td>');
+        html.push('<td><span class="err-badge">' + escape(r.source || '?') + '</span></td>');
+        html.push('<td class="err-count">' + r.occurrence_count + '</td>');
+        html.push('<td>' + (r.card_generated
+          ? '<span class="err-badge is-card">card ✓</span>'
+          : '<span class="text-muted">—</span>') + '</td>');
+        html.push('<td><code>' + (r.last_seen_at || '').slice(0, 19) + '</code></td>');
+        html.push('</tr>');
+      }
+      html.push('</tbody></table>');
+      $('errorsContainer').innerHTML = html.join('');
+    }
+
+    function escape(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* ─── import flow ─────────────────────────────────────────────── */
+    $('importBtn').addEventListener('click', async () => {
+      $('importOut').textContent = '';
+      const log = (s) => { $('importOut').textContent += s + '\n'; };
+      const dayId = $('dayIdIn').value.trim();
+      const raw   = $('jsonIn').value.trim();
+      if (!dayId || !raw) { log('املأ day_id والـ JSON أوّلاً.'); return; }
+
+      try {
+        const { reportId, errorResults } = await importChatGPTReport(raw, dayId);
+        log('chatgpt_reports row inserted: ' + reportId);
+        errorResults.forEach((r, i) => {
+          if (r.skipped) {
+            log('  ' + (i+1) + ') skipped — ' + r.reason);
+          } else {
+            log('  ' + (i+1) + ') ' + r.action +
+                ': ' + r.row.wrong_form + ' (count=' + r.row.occurrence_count +
+                ', card_generated=' + r.row.card_generated + ')');
+          }
+        });
+        await load();
+      } catch (e) {
+        log('FAILED: ' + e.message);
+      }
+    });
+
+    /* ─── wire up ─────────────────────────────────────────────────── */
+    $('reloadBtn').addEventListener('click', load);
+    ['filterType', 'filterSource', 'filterCard'].forEach(id =>
+      $(id).addEventListener('change', load));
+    load();
+  </script>
+</body>
+</html>

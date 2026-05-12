@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>اختبار اتّصال Supabase</title>
+  <link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+  <main class="container main-content" role="main">
+    <section class="section">
+      <h1>اختبار اتّصال Supabase</h1>
+      <p class="text-muted mb-4">
+        صفحة تشخيص: تحقّق من أنّ <code>config.js</code> صحيح + الـ Auth تعمل +
+        الـ <code>generate_card_from_error</code> trigger يعمل من الـ client.
+      </p>
+
+      <div id="configStatus" class="callout callout-info">
+        جارٍ فحص الـ config...
+      </div>
+
+      <h2 class="mt-6">1. تسجيل دخول</h2>
+      <p class="text-muted">استخدم الإيميل + كلمة السرّ التي أنشأت في Supabase Auth UI.</p>
+      <div class="field-group">
+        <label for="emailIn" class="field-label">البريد</label>
+        <input type="email" id="emailIn" autocomplete="email" dir="ltr">
+      </div>
+      <div class="field-group">
+        <label for="pwIn" class="field-label">كلمة السرّ</label>
+        <input type="password" id="pwIn" autocomplete="current-password" dir="ltr">
+      </div>
+      <button type="button" id="signInBtn" class="btn-primary">دخول</button>
+      <button type="button" id="signOutBtn" class="btn-tertiary" hidden>خروج</button>
+      <p id="authStatus" class="text-muted mt-2"></p>
+
+      <h2 class="mt-6">2. قراءة المستخدم من الجدول</h2>
+      <button type="button" id="readUserBtn" class="btn-secondary" disabled>اقرأ <code>users</code></button>
+      <pre id="userOut" class="mintdeck-tsv" style="max-height:200px;"></pre>
+
+      <h2 class="mt-6">3. اختبار الـ trigger</h2>
+      <p class="text-muted">
+        يُنشئ خطأً وهميّاً بعدّاد 1 ثمّ يرفعه إلى 3 — يجب أن يظهر سجلّ
+        البطاقة المُولَّدة، ثمّ يُنظَّف الكلّ بعد ثانيتَين.
+      </p>
+      <button type="button" id="triggerTestBtn" class="btn-secondary" disabled>شغّل اختبار الـ trigger</button>
+      <pre id="triggerOut" class="mintdeck-tsv" style="max-height:300px;"></pre>
+    </section>
+  </main>
+
+  <script type="module">
+    import {
+      supabase, isConfigured, signIn, signOut, currentUser
+    } from '../assets/js/supabase-client.js';
+
+    const $ = (id) => document.getElementById(id);
+
+    /* ─── 1. config status ────────────────────────────────────────── */
+    function showConfigStatus() {
+      const el = $('configStatus');
+      if (isConfigured) {
+        el.className = 'callout callout-success';
+        el.textContent = 'الـ config محمَّل بقيم حقيقيّة. جاهز للاختبار.';
+      } else {
+        el.className = 'callout callout-warning';
+        el.innerHTML = '<strong>config.js يحتوي placeholders.</strong> ' +
+          'افتح <code>assets/js/config.js</code> واستبدل <code>SUPABASE_URL</code> ' +
+          'و <code>SUPABASE_ANON_KEY</code> بالقيم الحقيقيّة من Supabase Dashboard → Settings → API.';
+      }
+    }
+    showConfigStatus();
+
+    /* ─── 2. auth flow ────────────────────────────────────────────── */
+    async function refreshAuthUI() {
+      const u = await currentUser();
+      if (u) {
+        $('authStatus').textContent = 'مسجَّل دخول كـ ' + u.email + ' (uid: ' + u.id + ')';
+        $('signOutBtn').hidden = false;
+        $('readUserBtn').disabled = false;
+        $('triggerTestBtn').disabled = false;
+      } else {
+        $('authStatus').textContent = 'لا توجد جلسة.';
+        $('signOutBtn').hidden = true;
+        $('readUserBtn').disabled = true;
+        $('triggerTestBtn').disabled = true;
+      }
+    }
+    refreshAuthUI();
+
+    $('signInBtn').addEventListener('click', async () => {
+      try {
+        await signIn($('emailIn').value, $('pwIn').value);
+        await refreshAuthUI();
+      } catch (e) {
+        $('authStatus').textContent = 'فشل تسجيل الدخول: ' + e.message;
+      }
+    });
+
+    $('signOutBtn').addEventListener('click', async () => {
+      await signOut();
+      await refreshAuthUI();
+    });
+
+    /* ─── 3. read own users row ───────────────────────────────────── */
+    $('readUserBtn').addEventListener('click', async () => {
+      const { data, error } = await supabase.from('users').select('*');
+      $('userOut').textContent = error
+        ? 'خطأ: ' + error.message
+        : JSON.stringify(data, null, 2);
+    });
+
+    /* ─── 4. trigger smoke test ───────────────────────────────────── */
+    $('triggerTestBtn').addEventListener('click', async () => {
+      const log = (line) => { $('triggerOut').textContent += line + '\n'; };
+      $('triggerOut').textContent = '';
+
+      const u = await currentUser();
+
+      log('1) INSERT error at count=1');
+      const { data: ins, error: e1 } = await supabase
+        .from('errors')
+        .insert({
+          user_id: u.id,
+          error_type: 'grammar',
+          wrong_form: 'TEST-' + Date.now(),
+          correct_form: 'TEST-correct',
+          rule_violated: 'trigger smoke test',
+          context_sentence: 'placeholder context',
+          source: 'claude_manual'
+        })
+        .select('*')
+        .single();
+      if (e1) { log('   FAILED: ' + e1.message); return; }
+      log('   ok, id=' + ins.id + ', card_generated=' + ins.card_generated);
+
+      log('2) UPDATE occurrence_count -> 3 (expect trigger to fire)');
+      const { data: upd, error: e2 } = await supabase
+        .from('errors')
+        .update({ occurrence_count: 3 })
+        .eq('id', ins.id)
+        .select('*')
+        .single();
+      if (e2) { log('   FAILED: ' + e2.message); return; }
+      log('   ok, card_generated=' + upd.card_generated + ', card_id=' + upd.card_id);
+
+      log('3) SELECT generated card');
+      const { data: card, error: e3 } = await supabase
+        .from('cards')
+        .select('id, card_type, front, back, weight_multiplier')
+        .eq('source_id', ins.id)
+        .single();
+      if (e3) { log('   FAILED: ' + e3.message); return; }
+      log('   card.front = ' + card.front);
+      log('   card.back  = ' + card.back);
+      log('   weight     = ' + card.weight_multiplier);
+
+      log('4) Cleanup in 2s...');
+      setTimeout(async () => {
+        await supabase.from('cards').delete().eq('id', card.id);
+        await supabase.from('errors').delete().eq('id', ins.id);
+        log('   cleaned. test complete.');
+      }, 2000);
+    });
+  </script>
+</body>
+</html>
