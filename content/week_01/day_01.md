@@ -84,13 +84,15 @@ mintdeck_tsv: |
 
 تخيّل هذا المشهد: أنت في مقابلة عمل في شركة تقنية. المدير ينظر إليك ويقول:
 
-> "Tell me about your previous manager. What kind of person is he?"
+:::block "Tell me about your previous manager. What kind of person is he?":::
 
-تردّ بحماس: *"He work very hard. He don't like lazy people. He always understanding our problems."*
+تردّ بحماس:
+
+:::block "He work very hard. He don't like lazy people. He always understanding our problems.":::
 
 المدير يبتسم بأدب — لكن في رأسه، خصم 30% من تقييمك.
 
-ثلاث جمل، ثلاث أخطاء، ثلاث قواعد فقدتها في خمس ثوانٍ. **"He work"** (نسيت الـ s). **"He don't"** (نسيت doesn't). **"He understanding"** (استخدمت -ing مع stative verb).
+ثلاث جمل، ثلاث أخطاء، ثلاث قواعد فقدتها في خمس ثوانٍ. **::He work::** (نسيت الـ s). **::He don't::** (نسيت ::doesn't::). **::He understanding::** (استخدمت -ing مع ::stative verb::).
 
 هذي القواعد الثلاث هي **محور اليوم**. لو أتقنتها، تستطيع أن تتكلّم عن أيّ شخص في حياتك بثقة. لو فقدتها، ستبدو كمتعلّم سنة أولى رغم سنوات الدراسة.
 
@@ -98,60 +100,64 @@ mintdeck_tsv: |
 
 ⚠️ **ثلاثة فخاخ خاصة بالعرب — احذرها قبل ما تتعلّم القاعدة:**
 
-**الفخّ الأوّل: نسيان الـ s مع he/she/it**
+**الفخّ الأوّل: نسيان الـ s مع ::he/she/it::**
 
 في العربية: "هو يعمل" — لا يوجد فرق صرفي بين "أنا أعمل" و "هو يعمل". في الإنقليزية، الفرق صارخ:
-- I work / You work / We work / **He workS**
+
+:::block I work / You work / We work / He workS:::
 
 دماغك مبرمَج على عدم رؤية الفرق. النتيجة: تنسى الـ s **حتى لو تعرف القاعدة**.
 
-**الفخّ الثاني: استخدام -ing مع Stative Verbs**
+**الفخّ الثاني: استخدام -ing مع ::Stative Verbs::**
 
-تترجم "أنا أفهمك" حرفياً → *"I am understanding you"* ❌
+تترجم "أنا أفهمك" حرفياً → ::"I am understanding you":: (خطأ)
 
-في الإنقليزية، أفعال الإدراك والمشاعر (know, understand, believe, like, want) **لا تُصرَّف بـ -ing** في Present Simple. الفعل بشكله الأصلي يعني الحالة المستمرّة فعلاً.
+في الإنقليزية، أفعال الإدراك والمشاعر (::know, understand, believe, like, want::) **لا تُصرَّف بـ -ing** في ::Present Simple::. الفعل بشكله الأصلي يعني الحالة المستمرّة فعلاً.
 
-**الفخّ الثالث: don't بدل doesn't مع 3rd person**
+**الفخّ الثالث: ::don't:: بدل ::doesn't:: مع ::3rd person::**
 
-"هو لا يحبّ" → *"He don't like"* ❌
-- الصحيح: **He doesn't like** (والفعل يرجع للأصل: like، ليس likes)
+"هو لا يحبّ" → ::"He don't like":: (خطأ)
 
-> 💡 **القاعدة الذهبية:** مع `doesn't`، الفعل **يفقد** الـ s — لأنّ الـ does هو الذي حملها.
+- الصحيح: **::He doesn't like::** (والفعل يرجع للأصل: ::like::، ليس ::likes::)
+
+> **القاعدة الذهبية:** مع `doesn't`، الفعل **يفقد** الـ s — لأنّ الـ ::does:: هو الذي حملها.
 
 ## GRAMMAR
 
 ### المبدأ الأساسي
 
-**Present Simple = الحالة الثابتة.** ليس "الآن"، بل "دائماً، عموماً، كحقيقة".
+**::Present Simple:: = الحالة الثابتة.** ليس "الآن"، بل "دائماً، عموماً، كحقيقة".
 
 | الاستخدام | مثال |
 |---|---|
 | روتين دائم | She **drinks** coffee every morning. |
 | حقيقة عن شخص | My brother **lives** in Riyadh. |
 | حقيقة علمية | Water **boils** at 100°C. |
-| مشاعر / إدراك (stative) | I **know** the answer. |
+| مشاعر / إدراك (::stative::) | I **know** the answer. |
 | جدول ثابت | The train **leaves** at 8 tomorrow. |
 
-### Stative Verbs (الأفعال الحالية — لا تأخذ -ing)
+### ::Stative Verbs:: (الأفعال الحالية — لا تأخذ -ing)
 
 هذي الأفعال تصف **حالة داخلية**، ليست فعلاً قابلاً للملاحظة:
-الإدراك:    know, understand, believe, mean, remember, forget, realize, notice
-المشاعر:    love, hate, like, want, need, prefer, mind
-الملكية:    have, own, belong, contain, consist, include
-الإحساس:    seem, appear, look, sound, taste, smell
 
-> ⚠️ "I am knowing him" خطأ. الصحيح: **"I know him"**.
+- الإدراك:    ::know, understand, believe, mean, remember, forget, realize, notice::
+- المشاعر:    ::love, hate, like, want, need, prefer, mind::
+- الملكية:    ::have, own, belong, contain, consist, include::
+- الإحساس:    ::seem, appear, look, sound, taste, smell::
 
-### 3rd Person Singular — الجدول الكامل
+> **تحذير:** ::"I am knowing him":: خطأ. الصحيح: **::"I know him"::**.
 
-| الضمير | Positive | Negative | Question |
+### ::3rd Person Singular:: — الجدول الكامل
+
+| الضمير | ::Positive:: | ::Negative:: | ::Question:: |
 |---|---|---|---|
 | I / You / We / They | I **work** | I **don't** work | **Do** you work? |
 | He / She / It | She **works** | She **doesn't** work | **Does** she work? |
 
 **انتبه:** مع `does/doesn't`، الفعل **يرجع للأصل**:
-- ❌ She doesn't ~~works~~ here.
-- ✅ She doesn't **work** here.
+
+- (خطأ) She doesn't ~~works~~ here.
+- (صحيح) ::She doesn't work here.::
 
 ## GRAMMAR_EXERCISES
 
@@ -245,21 +251,22 @@ mintdeck_tsv: |
 
 ## SPELLING
 
-### 🔗 لماذا الإملاء **الآن**؟
+### لماذا الإملاء **الآن**؟
 
-تعلّمت قاعدة الـ s في 3rd person — لكن الـ "s" ليست دائماً مجرّد s. هي **أربع قواعد إملائية مختلفة** حسب نهاية الفعل. لو لم تتقنها، ستكتب "He studys" بدل "studies"، و"She watchs" بدل "watches". هذي الأخطاء تكشف مستواك فوراً.
+تعلّمت قاعدة الـ s في ::3rd person:: — لكن الـ "s" ليست دائماً مجرّد s. هي **أربع قواعد إملائية مختلفة** حسب نهاية الفعل. لو لم تتقنها، ستكتب ::"He studys":: بدل ::"studies"::، و::"She watchs":: بدل ::"watches"::. هذي الأخطاء تكشف مستواك فوراً.
 
 ### القواعد الأربع
 
 **القاعدة 1 (الافتراضية): الفعل + s**
-- work → works
-- play → plays
-- run → runs
-- listen → listens
 
-**القاعدة 2: ينتهي بـ -s, -ss, -sh, -ch, -x, -z, -o → أضف -es**
+- ::work → works::
+- ::play → plays::
+- ::run → runs::
+- ::listen → listens::
 
-(لأنّ النطق يستحيل بدون e — جرّب: "watchs" 🤔)
+**القاعدة 2: ينتهي بـ ::-s, -ss, -sh, -ch, -x, -z, -o:: → أضف ::-es::**
+
+(لأنّ النطق يستحيل بدون e — جرّب: ::"watchs"::)
 
 | الفعل | 3rd person |
 |---|---|
@@ -271,9 +278,9 @@ mintdeck_tsv: |
 | go | go**es** |
 | do | do**es** |
 
-**القاعدة 3: ساكن + y → استبدل بـ -ies**
+**القاعدة 3: ساكن + ::y:: → استبدل بـ ::-ies::**
 
-| الفعل | 3rd person |
+| الفعل | ::3rd person:: |
 |---|---|
 | study | stud**ies** |
 | try | tr**ies** |
@@ -281,24 +288,24 @@ mintdeck_tsv: |
 | fly | fl**ies** |
 | cry | cr**ies** |
 
-**القاعدة 4: متحرّك + y → أضف -s فقط (لا تغيّر y!)**
+**القاعدة 4: متحرّك + ::y:: → أضف ::-s:: فقط (لا تغيّر ::y::!)**
 
-| الفعل | 3rd person |
+| الفعل | ::3rd person:: |
 |---|---|
 | play | play**s** (ليس plies!) |
 | enjoy | enjoy**s** |
 | say | say**s** |
 | buy | buy**s** |
 
-> 💡 **الفرق بين القاعدتين 3 و 4:** انظر للحرف **قبل** الـ y. لو ساكن (st**u**dy → د) → ies. لو متحرّك (pl**a**y → a) → s فقط.
+> **الفرق بين القاعدتين 3 و 4:** انظر للحرف **قبل** الـ ::y::. لو ساكن (::st-u-dy::) → ::ies::. لو متحرّك (::pl-a-y::) → ::s:: فقط.
 
-### نطق الـ -s/-es (3 أصوات)
+### نطق الـ ::-s/-es:: (3 أصوات)
 
 | الصوت | متى | أمثلة |
 |---|---|---|
-| **/s/** | بعد أصوات صامتة (p, t, k, f) | works, stops, eats |
-| **/z/** | بعد أصوات صوتية + متحرّكات | goes, plays, runs |
-| **/ɪz/** | بعد -s, -sh, -ch, -x, -z | watches, washes, fixes |
+| **/s/** | بعد أصوات صامتة (::p, t, k, f::) | ::works, stops, eats:: |
+| **/z/** | بعد أصوات صوتية + متحرّكات | ::goes, plays, runs:: |
+| **/ɪz/** | بعد ::-s, -sh, -ch, -x, -z:: | ::watches, washes, fixes:: |
 
 > جرّب نطقها: لو نطقتها /s/ بدل /ɪz/، ستلتصق الأصوات ولن تُفهَم.
 
@@ -398,7 +405,7 @@ mintdeck_tsv: |
 
 ## READING
 
-📖 **{{reading_title}}** — Level 2
+**::{{reading_title}}::** — ::Level 2::
 
 **مدّة المهمّة:** 15 دقيقة
 
@@ -409,7 +416,7 @@ mintdeck_tsv: |
 1. **القراءة الأولى (5 دقائق):** اقرأ القصّة كاملة لفهم الموضوع. لا تتوقّف عند الكلمات المجهولة.
 
 2. **القراءة الثانية (5 دقائق) — مهمّة محدّدة:**
-   - **استخرج 5 أفعال في 3rd person singular** (انتهت بـ -s, -es, أو -ies)
+   - **استخرج 5 أفعال في ::3rd person singular::** (انتهت بـ ::-s, -es::, أو ::-ies::)
    - لكل فعل، اكتب: الفعل الأصلي + شكله في القصّة + القاعدة (1، 2، 3، أو 4)
 
    | الفعل في القصّة | الفعل الأصلي | القاعدة |
@@ -426,20 +433,20 @@ mintdeck_tsv: |
 
 ## PRONUNCIATION
 
-🔊 **مدّة الجلسة:** 10 دقائق
+**مدّة الجلسة:** 10 دقائق
 
 ### الكلمات الأربع (تطبيق على الأصوات الثلاثة)
 
-:::youglish
-- works | نطق /s/ — الصوت قبلها /k/ (بدون اهتزاز)
-- goes | نطق /z/ — الصوت قبلها صوتي
-- watches | نطق /ɪz/ — لأنّها تنتهي بـ -ch
-- studies | نطق /z/ — تحوّل -y إلى -ies
+:::pronunciation
+- works | /wɜːrks/ | نطق /s/ — الصوت قبلها /k/ (بدون اهتزاز)
+- goes | /ɡoʊz/ | نطق /z/ — الصوت قبلها صوتي
+- watches | /ˈwɒtʃɪz/ | نطق /ɪz/ — لأنّها تنتهي بـ -ch
+- studies | /ˈstʌdiz/ | نطق /z/ — تحوّل -y إلى -ies
 :::
 
-### Shadowing — الخطوات
+### ::Shadowing:: — الخطوات
 
-1. اختر جملة واحدة من YouGlish فيها الكلمة (المدّة المثلى: 5-10 ثوانٍ)
+1. اختر جملة واحدة من ::YouGlish:: فيها الكلمة (المدّة المثلى: 5-10 ثوانٍ)
 2. اسمعها **3 مرّات** بدون تكرار
 3. كرّرها **10 مرّات** — قلّد النبرة والإيقاع، لا فقط الكلمات
 
@@ -491,25 +498,34 @@ Let's start.
 :::
 ## WRITING_GUIDE
 
-✍️ **مدّة الكتابة:** 15 دقيقة | **الهدف:** 50 كلمة
+**مدّة الكتابة:** 15 دقيقة | **الهدف:** 50 كلمة
 
 ### قبل الكتابة (دقيقتان)
 
 اختر **شخصاً واحداً تعرفه جيّداً**:
+
 - أخوك / أختك / أمّك / أبوك
 - زميل في العمل / صديق من الجامعة
 
 اكتب اسمه في ذهنك (لا داعي لكتابته في النصّ).
 
 ### بنية الفقرة المقترحة
-الجملة 1: من هو + ماذا يعمل
-(مثال: My brother works as an engineer at Aramco.)
-الجملة 2-3: روتينه اليومي (3rd person + -s)
-(مثال: He wakes up at 5 AM. He goes to the gym before work.)
-الجملة 4: ما يحبّه/يكرهه (stative verb)
-(مثال: He loves coffee but he doesn't like tea.)
-الجملة 5: شيء يميّزه (3rd person + -s)
-(مثال: He always carries a black notebook with him.)
+
+- **الجملة 1:** من هو + ماذا يعمل
+
+  :::block My brother works as an engineer at Aramco.:::
+
+- **الجملة 2-3:** روتينه اليومي (::3rd person + -s::)
+
+  :::block He wakes up at 5 AM. He goes to the gym before work.:::
+
+- **الجملة 4:** ما يحبّه/يكرهه (::stative verb::)
+
+  :::block He loves coffee but he doesn't like tea.:::
+
+- **الجملة 5:** شيء يميّزه (::3rd person + -s::)
+
+  :::block He always carries a black notebook with him.:::
 
 ### قاعدة الكتابة الحرّة
 
@@ -524,13 +540,13 @@ Let's start.
 - استخدم قاعدتين مختلفتين على الأقل من الـ 4 الإملائية
 :::
 
-### Self-Edit Checklist (3 دقائق — إلزامي قبل الإرسال)
+### ::Self-Edit Checklist:: (3 دقائق — إلزامي قبل الإرسال)
 
 اقرأ نصّك **بصوت عالٍ**، وتحقّق:
 
-- [ ] هل كل فعل بعد he/she/it فيه **-s، -es، أو -ies**؟ (ضع دائرة حول كل واحد)
-- [ ] هل استخدمت **doesn't** (ليس don't) للنفي؟
-- [ ] هل أيّ stative verb (know, like, want...) **بدون -ing**؟
+- [ ] هل كل فعل بعد ::he/she/it:: فيه **::-s، -es::، أو ::-ies::**؟ (ضع دائرة حول كل واحد)
+- [ ] هل استخدمت **::doesn't::** (ليس ::don't::) للنفي؟
+- [ ] هل أيّ ::stative verb:: (::know, like, want::...) **بدون ::-ing::**؟
 - [ ] هل كل جملة تنتهي بنقطة؟
 - [ ] هل كل جملة تبدأ بحرف كبير؟
 - [ ] هل عدد الكلمات **50 أو أكثر**؟
@@ -541,22 +557,22 @@ Let's start.
 
 ## MINTDECK
 
-💾 **15 بطاقة لاستيرادها في MintDeck**
+**15 بطاقة لاستيرادها في ::MintDeck::**
 
-البطاقات الـ 15 موجودة في الـ Frontmatter (`mintdeck_tsv`) ومُولَّدة في الصفحة كزرّ نسخ.
+البطاقات الـ 15 موجودة في الـ ::Frontmatter:: (`mintdeck_tsv`) ومُولَّدة في الصفحة كزرّ نسخ.
 
 ### كيف تستوردها
 
 1. اضغط زرّ **"نسخ TSV"** أعلى هذا القسم
-2. افتح MintDeck على iPhone
-3. اختر deck **"English-Daily"** → Import → Paste
-4. تأكّد من فصل الحقول بـ Tab (ليس فاصلة)
+2. افتح ::MintDeck:: على ::iPhone::
+3. اختر ::deck:: **::"English-Daily"::** → ::Import:: → ::Paste::
+4. تأكّد من فصل الحقول بـ ::Tab:: (ليس فاصلة)
 
 ### ملاحظات على البطاقات
 
-- **كل البطاقات في 3rd person singular** — هذي إعادة تأكيد للقاعدة، ليس فقط مفردات
-- **9 stative verbs + 6 action verbs** — توازن مقصود
-- **YouGlish في كل بطاقة** — لمّا تظهر البطاقة، اضغط الرابط واسمع الكلمة في سياق طبيعي
+- **كل البطاقات في ::3rd person singular::** — هذي إعادة تأكيد للقاعدة، ليس فقط مفردات
+- **9 ::stative verbs:: + 6 ::action verbs::** — توازن مقصود
+- **::YouGlish:: في كل بطاقة** — لمّا تظهر البطاقة، اضغط الرابط واسمع الكلمة في سياق طبيعي
 
 :::callout type="info"
 **خطأ شائع:** الناس يستوردون البطاقات وينسونها. **القاعدة:** أوّل مراجعة الليلة بعد العشاء، ثاني مراجعة غداً قبل النوم. بعدها FSRS algorithm يتولّى الجدولة.

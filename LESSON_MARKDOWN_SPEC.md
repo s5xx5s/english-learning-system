@@ -140,6 +140,69 @@ mintdeck_tsv: |
 
 ---
 
+## English Wrapping — Syntax صريح (إلزامي)
+
+لا يوجد اكتشاف تلقائي للإنجليزية. الكاتب (Claude) يُعلِّم بصراحة:
+
+### Inline: `::word::`
+
+لكلمة أو مصطلح إنجليزي قصير (1-2 كلمة) داخل سطر عربي:
+
+````markdown
+استخدم ::Present Simple:: في الجملة الأولى.
+فعل ::work:: يصبح ::works:: في 3rd person.
+````
+
+يُحوَّل إلى:
+
+````html
+استخدم <span class="en">Present Simple</span> في الجملة الأولى.
+````
+
+تحذير: علامات الترقيم الإنجليزية يجب أن تكون **داخل** الـ `::`:
+
+- صحيح:    `قال ::Hello, world!:: ثم سكت`
+- خطأ:     `قال ::Hello, world::! ثم سكت`  (! تنفصل وتنتقل)
+
+### Block: `:::block ... :::`
+
+لجملة إنجليزية كاملة (3+ كلمات) في سطر مستقلّ:
+
+````markdown
+مثال على الـ stative verbs:
+
+:::block I understand what you mean.:::
+
+لاحظ أنّ "understand" لا تأخذ -ing.
+````
+
+يُحوَّل إلى:
+
+````html
+<div class="en-block">I understand what you mean.</div>
+````
+
+ملاحظة: الـ `:::block` يجب أن يبدأ في عمود 1 (بداية السطر) وأن تنتهي `:::` في نهاية سطر — حتّى لا يلتقطها marked كـ `<p>` ضمن فقرة.
+
+### قاعدة الاختيار
+
+| الحالة | الـ syntax |
+|---|---|
+| 1-2 كلمة داخل سطر عربي | `::token::` |
+| 3+ كلمات في سياق عربي | `::sentence::` (إذا داخل جدول/قائمة) |
+| جملة كاملة مستقلّة، تستحقّ بروزاً بصرياً | `:::block sentence:::` |
+| داخل MCQ/fillblank/freewriting | لا تلفّ — الـ block نفسه يتعامل |
+| داخل code block أو pre | لا تلفّ — الـ block نفسه LTR |
+
+### ممنوع
+
+- لا تستخدم `<span dir="ltr">` يدوياً
+- لا تستخدم `<div dir="ltr">` يدوياً
+- لا تترك إنجليزية حرّة (بدون `::`) داخل عربية — bidi سيكسرها
+- لا تستخدم `::...::` فارغة أو فيها newline داخلها
+
+---
+
 ## Custom Blocks (التحويلات الخاصّة)
 
 `build_day.js` يحوّل blocks خاصّة من Markdown إلى HTML تفاعلي.
@@ -261,7 +324,38 @@ mintdeck_tsv: |
 
 ---
 
-### Block 5: Voice Recorder
+### Block 5: Pronunciation (3 أزرار: Cambridge / Forvo / YouGlish)
+
+**Markdown:**
+````markdown
+:::pronunciation
+- works | /wɜːrks/ | نطق /s/
+- goes | /ɡoʊz/ | نطق /z/
+- watches | /ˈwɒtʃɪz/ | نطق /ɪz/
+:::
+````
+
+كل سطر صيغته: `- word | ipa? | note?` — فقط `word` إلزامي، الـ ipa والـ note اختياريّان.
+
+**HTML المُولَّد (لكل كلمة):**
+````html
+<div class="pron-item">
+  <span class="pron-word">works</span>
+  <span class="pron-ipa">/wɜːrks/</span>
+  <span class="pron-note">نطق /s/</span>
+  <span class="pron-buttons">
+    <a class="pron-btn pron-btn-cambridge" href="https://dictionary.cambridge.org/dictionary/english/works">Cambridge</a>
+    <a class="pron-btn pron-btn-forvo" href="https://forvo.com/word/works/#en">Forvo</a>
+    <a class="pron-btn pron-btn-youglish" href="https://youglish.com/pronounce/works/english/us">YouGlish</a>
+  </span>
+</div>
+````
+
+> ملاحظة: `:::youglish` لا يزال مدعوماً لكنّه legacy — استخدم `:::pronunciation` للدروس الجديدة.
+
+---
+
+### Block 6: Voice Recorder
 
 **Markdown:**
 ````markdown
@@ -285,7 +379,7 @@ mintdeck_tsv: |
 
 ---
 
-### Block 6: Callout (تنبيهات)
+### Block 7: Callout (تنبيهات)
 
 **Markdown:**
 ````markdown

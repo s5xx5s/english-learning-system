@@ -1,15 +1,6 @@
 /* =====================================================================
    _scripts/build_day.js
    Converts content/week_XX/day_XX.md  →  weeks/week_XX/day_XX.html
-
-   English handling: explicit syntax only.
-     ::Token::            → <span class="en">Token</span>
-     :::block Sentence::: → <div class="en-block">Sentence</div>
-
-   wrapInlineEnglish() (legacy auto-wrap) is still applied AFTER marked
-   as a fallback for content that has not yet been migrated to explicit
-   syntax. It will be removed once all lesson files are migrated.
-
    Usage: npm run build:day -- 01 01
    ===================================================================== */
 
@@ -28,7 +19,7 @@ const SECTION_IDS = [
   'PRONUNCIATION', 'CHATGPT', 'WRITING_GUIDE', 'MINTDECK'
 ];
 
-/* --------- tiny helpers --------- */
+/* --------- helpers --------- */
 
 function pad(n) { return String(n).padStart(2, '0'); }
 
@@ -49,20 +40,17 @@ function escapeHtml(s) {
     .replace(/'/g, '&#39;');
 }
 
-/** Escape <, >, & only — leaves * and _ alone so renderInline() can still
- *  pick them up as bold/italic. Used inside custom blocks. */
-function escapeHtmlExceptMd(s) {
-  if (!s) return '';
-  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
 /** Inline-only markdown: bold, italic, code, links. NOT block-level. */
 function renderInline(md) {
   if (!md) return '';
   let s = md;
+  // Code inline first (so its content isn't touched by other rules)
   s = s.replace(/`([^`]+)`/g, (_, c) => '<code>' + escapeHtml(c) + '</code>');
+  // Bold
   s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // Italic
   s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<em>$2</em>');
+  // Links [text](url)
   s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, txt, url) =>
     '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' + txt + '</a>');
   return s;
@@ -79,55 +67,15 @@ function parseAttrs(str) {
 }
 
 /* =====================================================================
-   1. EXPLICIT English wrappers — the new contract
-   ===================================================================== */
-
-/**
- * `:::block English sentence here:::`  →  `<div class="en-block">...</div>`
- *
- * Must run BEFORE the inline `::...::` replacer, otherwise the inner `::`
- * pair (if any) would be eaten first.  Block delimiter `:::` is unambiguous
- * — it can never be part of a balanced `::token::`.
- *
- * The content cannot itself contain `:::` (we do not nest blocks).
- * Anchored to start/end of line via `^...$` + multiline flag so it stays
- * block-level and marked() never wraps it inside a `<p>`.
- */
-function transformBlockEnglish(text) {
-  return text.replace(
-    /^:::block\s+([\s\S]+?)\s*:::$/gm,
-    (_, content) => '\n\n<div class="en-block">' + escapeHtml(content.trim()) + '</div>\n\n'
-  );
-}
-
-/**
- * `::English token::`  →  `<span class="en">...</span>`
- *
- * Uses `[^:\n]+?` (not `[\s\S]+?`) so the pattern cannot cross a `::`
- * boundary or a newline — that keeps inline wraps tight to a single
- * phrase and avoids accidentally swallowing the next token.
- *
- * Empty / whitespace-only content is left as raw text (we don't want
- * `::` literals to vanish silently).
- */
-function transformInlineEnglish(text) {
-  return text.replace(
-    /::([^:\n]+?)::/g,
-    (match, content) => {
-      const trimmed = content.trim();
-      if (!trimmed) return match;
-      return '<span class="en">' + escapeHtml(trimmed) + '</span>';
-    }
-  );
-}
-
-/* =====================================================================
-   2. Body-level frontmatter interpolation
-      Expands {{lowercase_field}} (and dotted paths like
-      {{resources.podcast_url}}) inside the MD body before marked() runs.
-      Missing fields are left untouched so the teacher sees the typo.
+   Body-level frontmatter interpolation
+   Expands {{lowercase_field}} (and dotted paths like
+   {{resources.podcast_url}}) inside the MD body before marked() runs.
+   Missing fields are left untouched so the teacher sees the typo.
    ===================================================================== */
 function interpolateFrontmatter(md, data) {
+  // First lookup: dotted path (resources.podcast_url).
+  // Fallback: search nested objects for the leaf name (reading_title finds
+  // resources.reading_title without forcing the teacher to type the path).
   function lookup(key) {
     if (key.indexOf('.') !== -1) {
       const parts = key.split('.');
@@ -150,37 +98,69 @@ function interpolateFrontmatter(md, data) {
 
   return md.replace(/\{\{([a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)*)\}\}/g, (m, key) => {
     const v = lookup(key);
-    if (v === null || v === undefined) return m;
+    if (v === null || v === undefined) return m; // leave raw so typo is visible
+    // Trim trailing newline from YAML | block scalars (voice_prompt etc).
     return String(v).replace(/\n+$/, '');
   });
 }
 
 /* =====================================================================
-   3. Legacy fallback: wrapInlineEnglish (post-marked)
-      Wraps untagged English PHRASES so older lessons that haven't been
-      migrated to ::syntax:: still render correctly. Skips content already
-      inside <code>, <a>, <span>, or <bdi> — so an explicit <span class="en">
-      from transformInlineEnglish() is NOT double-wrapped.
+   Inline-English auto-wrapping (post-marked)
+   Wraps English PHRASES (2+ words) inside <p>, <li>, and <blockquote>
+   with <span dir="ltr" class="en">. Phrase boundaries deliberately
+   include adjacent quote marks (ASCII " ' or HTML entities &quot;
+   &#39;) so they ride along with the LTR run, instead of drifting in
+   the surrounding RTL context.
+   Content already inside <code>, <a>, <span>, or <bdi> is passed
+   through untouched.
    ===================================================================== */
 function wrapInlineEnglish(html) {
+  // Quote alternatives — ASCII, curly, or HTML-encoded.
   const QUOTE = '(?:&quot;|&#39;|["\'‘’“”])';
-  const SEP   = '(?:\\s|[.,;:!?()\\-–—]|&(?:quot|#39);)';
-  const WORD  = '[A-Za-z0-9’\']+';
-  const TAIL  = '[A-Za-z0-9.!?,’)\\]]?';
+  // Word separator: whitespace, common punctuation, dashes, or quote entity
+  // (so He said &quot;hi&quot; to me wraps as one run).
+  const SEP = '(?:\\s|[.,;:!?()\\-–—]|&(?:quot|#39);)';
+  // A word: letters / digits / internal apostrophe.
+  const WORD = '[A-Za-z0-9’\']+';
+  // Optional trailing punctuation so phrases can end at "manager." or "ready!".
+  const TAIL = '[A-Za-z0-9.!?,’)\\]]?';
 
+  // Two alternatives combined into one regex:
+  //   (A) QUOTED:   quote + 1+ words (separated by SEP) + quote.
+  //                 Allows single-word quoted phrases like &quot;hi&quot;.
+  //   (B) UNQUOTED: 2+ words.
+  // Lookbehind: not preceded by < (inside tag) or word char (mid-word).
+  // & is intentionally NOT excluded — phrase may START at &quot;.
   const PHRASE_RE = new RegExp(
     '(?<![<\\w])(' +
-      QUOTE + '[A-Za-z][A-Za-z0-9’\'\\-]*(?:' + SEP + '+' + WORD + ')*[A-Za-z0-9.!?,]?' + QUOTE +
+      // Case A
+      QUOTE +
+      '[A-Za-z][A-Za-z0-9’\'\\-]*' +
+      '(?:' + SEP + '+' + WORD + ')*' +
+      '[A-Za-z0-9.!?,]?' +
+      QUOTE +
     '|' +
-      '[A-Za-z][A-Za-z0-9’\'\\-]*(?:' + SEP + '+' + WORD + ')+' + TAIL +
+      // Case B
+      '[A-Za-z][A-Za-z0-9’\'\\-]*' +
+      '(?:' + SEP + '+' + WORD + ')+' +
+      TAIL +
     ')(?![\\w>])',
     'g'
   );
 
+  // Helpers to decide which CSS classes to attach to each wrap.
   const QUOTE_EDGE_RE = /(?:&quot;|&#39;|["'‘’“”])/;
   function isQuoted(t) {
     return new RegExp('^' + QUOTE_EDGE_RE.source).test(t) &&
            new RegExp(QUOTE_EDGE_RE.source + '$').test(t);
+  }
+  function countWords(t) {
+    // Replace HTML entities with space, then split on whitespace.
+    const plain = t.replace(/&(?:quot|#39|amp|lt|gt|nbsp);/g, ' ').trim();
+    return plain.split(/\s+/).filter(Boolean).length;
+  }
+  function endsInTerminal(t) {
+    return /[.!?](?:&quot;|&#39;|["'‘’“”])?$/.test(t);
   }
 
   return html.replace(
@@ -194,9 +174,11 @@ function wrapInlineEnglish(html) {
         if (chunk.length) {
           out += chunk.replace(PHRASE_RE, (match, captured) => {
             const quoted = isQuoted(captured);
+            const longTerm = countWords(captured) >= 3 && endsInTerminal(captured);
             let cls = 'en';
-            if (quoted) cls += ' en-quoted';
-            return '<span class="' + cls + '">' + captured + '</span>';
+            if (quoted)  cls += ' en-quoted';
+            if (longTerm) cls += ' en-block';
+            return '<span dir="ltr" class="' + cls + '">' + captured + '</span>';
           });
         }
         if (lt === -1) break;
@@ -204,6 +186,7 @@ function wrapInlineEnglish(html) {
         const gt = content.indexOf('>', lt);
         if (gt === -1) { out += content.slice(lt); break; }
         const tagName = (content.slice(lt + 1, gt).match(/^\/?(\w+)/) || [])[1] || '';
+        // Pass through content of these inline tags without re-wrapping.
         const skipContents = ['code', 'a', 'bdi', 'span'];
         if (skipContents.indexOf(tagName.toLowerCase()) !== -1 && content[lt + 1] !== '/') {
           const close = '</' + tagName + '>';
@@ -222,12 +205,14 @@ function wrapInlineEnglish(html) {
   );
 }
 
+
 /* =====================================================================
-   4. Custom block transformers
+   Custom block transformers
    ===================================================================== */
 
 /** Generic ::: block matcher.
- *  Captures: 1=type-token attrs string, 2=inner content body. */
+ *  Captures: 1=type, 2=attrs string, 3=inner content
+ */
 function transformBlocks(md, type, render) {
   const re = new RegExp(
     ':::' + type + '\\s*([^\\n]*)\\n([\\s\\S]*?)\\n:::',
@@ -280,6 +265,16 @@ function transformMCQ(md) {
   });
 }
 
+/** Escape HTML in user text but leave **bold** and *italic* and `code` for renderInline. */
+function escapeHtmlExceptMd(s) {
+  if (!s) return '';
+  // Only escape <, >, & — leave * and _ alone for renderInline
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
 /* -- Fill-in-blank -- */
 function transformFillBlank(md) {
   return transformBlocks(md, 'fillblank', (attrs, inner) => {
@@ -293,6 +288,7 @@ function transformFillBlank(md) {
       else if (/^\*\*Rule:\*\*/i.test(t)) rule = t.replace(/^\*\*Rule:\*\*\s*/i, '');
     });
 
+    // Replace _____ (3 or more underscores) with input
     const inputHtml = '<input type="text" class="fillblank-input" data-answer="' +
       escapeHtml(answer.trim()) + '" placeholder="?" aria-label="املأ الفراغ">';
     const sentenceHtml = renderInline(escapeHtmlExceptMd(sentence))
@@ -348,52 +344,7 @@ function transformFreeWriting(md) {
   });
 }
 
-/* -- Pronunciation block (3 buttons: Cambridge / Forvo / YouGlish) --
- *
- *   :::pronunciation
- *   - works | /wɜːrks/ | نطق /s/
- *   - goes  | /ɡoʊz/  | نطق /z/
- *   :::
- *
- * Each line is "word | ipa? | note?" — only `word` is required.
- */
-function transformPronunciation(md) {
-  return md.replace(
-    /:::pronunciation\s*\n([\s\S]+?)\n:::/g,
-    (_, body) => {
-      const items = body
-        .split('\n')
-        .map(l => l.trim())
-        .filter(l => l.startsWith('-'))
-        .map(line => {
-          const cleaned = line.replace(/^-\s*/, '');
-          const parts = cleaned.split('|').map(s => s.trim());
-          const word = parts[0] || '';
-          const ipa  = parts[1] || '';
-          const note = parts[2] || '';
-          if (!word) return '';
-          const encoded = encodeURIComponent(word);
-          return [
-            '  <div class="pron-item">',
-            '    <span class="pron-word">' + escapeHtml(word) + '</span>',
-            ipa  ? '    <span class="pron-ipa">' + escapeHtml(ipa) + '</span>' : '',
-            note ? '    <span class="pron-note">' + escapeHtml(note) + '</span>' : '',
-            '    <span class="pron-buttons">',
-            '      <a class="pron-btn pron-btn-cambridge" href="https://dictionary.cambridge.org/dictionary/english/' + encoded + '" target="_blank" rel="noopener">Cambridge</a>',
-            '      <a class="pron-btn pron-btn-forvo" href="https://forvo.com/word/' + encoded + '/#en" target="_blank" rel="noopener">Forvo</a>',
-            '      <a class="pron-btn pron-btn-youglish" href="https://youglish.com/pronounce/' + encoded + '/english/us" target="_blank" rel="noopener">YouGlish</a>',
-            '    </span>',
-            '  </div>'
-          ].filter(Boolean).join('\n');
-        })
-        .filter(Boolean)
-        .join('\n');
-      return '\n\n<div class="pronunciation-block">\n' + items + '\n</div>\n\n';
-    }
-  );
-}
-
-/* -- YouGlish (legacy block, still supported) -- */
+/* -- YouGlish -- */
 function transformYouGlish(md) {
   return transformBlocks(md, 'youglish', (attrs, inner) => {
     const items = inner.split('\n')
@@ -420,7 +371,11 @@ function transformYouGlish(md) {
       ].join('\n');
     }).join('\n');
 
-    return ['<div class="youglish-block">', itemsHtml, '</div>'].join('\n');
+    return [
+      '<div class="youglish-block">',
+      itemsHtml,
+      '</div>'
+    ].join('\n');
   });
 }
 
@@ -433,7 +388,7 @@ function transformVoiceRecorder(md) {
     inner.split('\n').forEach(line => {
       const t = line.trim();
       if (/^\*\*Task:\*\*/i.test(t)) task = t.replace(/^\*\*Task:\*\*\s*/i, '');
-      else if (t && !task) task = t;
+      else if (t && !task) task = t; // fallback: first non-empty line
     });
 
     return [
@@ -466,13 +421,18 @@ function transformCallouts(md) {
 }
 
 /* =====================================================================
-   5. Section splitter
+   Section splitting
    ===================================================================== */
 
 function splitIntoSections(mdBody) {
   const result = {};
   SECTION_IDS.forEach(id => { result[id] = ''; });
 
+  // Find ALL H2 headings (any text after `## `). Recognized SECTION_IDs
+  // produce real section content; unrecognized headings still act as
+  // BOUNDARIES so their content can never leak into the previous section.
+  // Unrecognized headings + their content are dropped from output (with a
+  // console warning so the teacher knows).
   const ANY_H2 = /^##\s+(.+?)\s*$/gm;
   const ID_RE  = /^(?:\S+\s+)?([A-Z_]+)$/;
 
@@ -500,7 +460,7 @@ function splitIntoSections(mdBody) {
 
   const unknown = allHeadings.filter(h => !h.sectionId);
   if (unknown.length) {
-    console.warn('  WARNING: تم تجاهل ' + unknown.length + ' عنوان H2 غير معروف:');
+    console.warn('  WARNING: تم تجاهل ' + unknown.length + ' عنوان H2 غير معروف (محتواها لن يُعرَض):');
     unknown.forEach(h => console.warn('    "## ' + h.heading + '"'));
   }
 
@@ -508,7 +468,7 @@ function splitIntoSections(mdBody) {
 }
 
 /* =====================================================================
-   6. Frontmatter helpers
+   Frontmatter helpers
    ===================================================================== */
 
 function validateFrontmatter(data) {
@@ -535,27 +495,7 @@ function buildSuccessChecklist(items) {
 }
 
 /* =====================================================================
-   7. processContent — exposed for tests
-      Runs the full transformation pipeline on a raw MD body (no
-      frontmatter, no template). Used by _scripts/tests/syntax.test.js
-      to verify ::syntax:: handling without spinning up the whole build.
-   ===================================================================== */
-function processContent(rawMd) {
-  let s = rawMd;
-  s = transformCallouts(s);
-  s = transformMCQ(s);
-  s = transformFillBlank(s);
-  s = transformFreeWriting(s);
-  s = transformPronunciation(s);
-  s = transformYouGlish(s);
-  s = transformVoiceRecorder(s);
-  s = transformBlockEnglish(s);
-  s = transformInlineEnglish(s);
-  return marked.parse(s);
-}
-
-/* =====================================================================
-   8. Main entry point
+   Main
    ===================================================================== */
 
 function buildDay(weekArg, dayArg) {
@@ -589,26 +529,21 @@ function buildDay(weekArg, dayArg) {
   validateFrontmatter(data);
 
   /* Expand {{lowercase_field}} from frontmatter inside the body BEFORE
-     custom blocks run. */
+     custom blocks run — so a teacher can write {{voice_prompt}} or
+     {{resources.podcast_url}} anywhere in the lesson body. */
   let body = interpolateFrontmatter(parsed.content, data);
 
-  /* Custom-block transformers — these consume MD that uses :::name ... :::
-     fences. Order: named blocks first (so :::pronunciation/:::mcq/etc
-     never collide with the bare :::block English wrapper). */
+  /* Transform custom blocks BEFORE marked */
   body = transformCallouts(body);
   body = transformMCQ(body);
   body = transformFillBlank(body);
   body = transformFreeWriting(body);
-  body = transformPronunciation(body);
   body = transformYouGlish(body);
   body = transformVoiceRecorder(body);
 
-  /* Explicit English wrappers — block first, then inline. */
-  body = transformBlockEnglish(body);
-  body = transformInlineEnglish(body);
-
-  /* Section split, then marked() per section. wrapInlineEnglish() is
-     applied as a transitional fallback for un-migrated content. */
+  /* Split by section headers, then run marked() per section. After each
+     marked render, auto-wrap inline English in <span dir="ltr"> for
+     bidi safety. */
   const sections = splitIntoSections(body);
   marked.setOptions({ gfm: true, breaks: false });
   const sectionsHtml = {};
@@ -621,18 +556,16 @@ function buildDay(weekArg, dayArg) {
     sectionsHtml[id] = wrapInlineEnglish(rendered);
   });
 
-  /* Template fill */
+  /* Read template and replace placeholders */
   const template = fs.readFileSync(templatePath, 'utf-8');
 
   const timers = data.timers || {};
   const resources = data.resources || {};
 
+  // Day type controls which sections show. Whitelist allowed values.
   const allowedDayTypes = ['regular', 'writing', 'reflection'];
   const dayTypeRaw = (data.day_type || 'regular').toString().toLowerCase();
   const dayType = allowedDayTypes.indexOf(dayTypeRaw) === -1 ? 'regular' : dayTypeRaw;
-
-  // Voice prompt may be a YAML block scalar — strip trailing newlines.
-  const voicePromptRaw = String(data.voice_prompt || '').replace(/\n+$/, '');
 
   const replacements = {
     '{{TITLE}}':            escapeHtml(data.title),
@@ -644,8 +577,6 @@ function buildDay(weekArg, dayArg) {
     '{{GOAL}}':             escapeHtml(data.goal),
     '{{DURATION_MINUTES}}': String(data.duration_minutes || 150),
     '{{DAY_TYPE}}':         dayType,
-
-    '{{VOICE_PROMPT}}':     escapeHtml(voicePromptRaw),
 
     '{{PODCAST_URL}}':      escapeHtml(resources.podcast_url || '#'),
     '{{PODCAST_TITLE}}':    escapeHtml(resources.podcast_title || 'بودكاست اليوم'),
@@ -677,14 +608,17 @@ function buildDay(weekArg, dayArg) {
     finalHtml = finalHtml.split(key).join(replacements[key]);
   });
 
+  /* Detect leftover placeholders */
   const leftover = finalHtml.match(/\{\{[A-Z_]+\}\}/g);
   if (leftover && leftover.length) {
     fail('placeholders لم تُملأ: ' + [...new Set(leftover)].join(', '));
   }
 
+  /* Write output */
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(outPath, finalHtml, 'utf-8');
 
+  /* Update manifest so dashboard knows which days are built */
   updateManifest(Number(week), Number(day), data.title || '');
 
   const sizeKB = (fs.statSync(outPath).size / 1024).toFixed(1);
@@ -699,7 +633,7 @@ function updateManifest(week, day, title) {
   let manifest = { built: [] };
   if (fs.existsSync(manifestPath)) {
     try { manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8')); }
-    catch (e) { manifest = { built: [] }; }
+    catch (e) { /* corrupt: rewrite from scratch */ manifest = { built: [] }; }
   }
   if (!Array.isArray(manifest.built)) manifest.built = [];
   manifest.built = manifest.built.filter(b => !(b.week === week && b.day === day));
@@ -715,10 +649,4 @@ if (require.main === module) {
   catch (e) { console.error('\n' + (e && e.message || e) + '\n'); process.exit(1); }
 }
 
-module.exports = {
-  buildDay,
-  processContent,
-  transformBlockEnglish,
-  transformInlineEnglish,
-  transformPronunciation
-};
+module.exports = { buildDay };

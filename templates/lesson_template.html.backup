@@ -180,20 +180,14 @@
 
     <section class="section" data-section="CHATGPT" aria-labelledby="sec-chatgpt">
       <div class="section-head">
-        <h2 id="sec-chatgpt">🗣️ ChatGPT Voice</h2>
+        <h2 id="sec-chatgpt">محادثة صوتيّة مع ChatGPT</h2>
         <label class="section-checkbox">
-          <input type="checkbox" data-section-check="CHATGPT" aria-label="أكملت ChatGPT Voice">
-          <span>أكملت</span>
+          <input type="checkbox" data-section="CHATGPT" aria-label="أنهيت محادثة ChatGPT">
+          <span>أنهيت</span>
         </label>
       </div>
       <div class="section-body">
-        <p>المدّة المقترحة: {{TIMER_CHATGPT}} دقيقة</p>
-        <div class="voice-prompt">
-          <p>الصق النصّ التالي في ChatGPT (Voice Mode):</p>
-          <div class="voice-prompt-text">{{VOICE_PROMPT}}</div>
-          <button class="btn-secondary" data-copy="voice-prompt">📋 نسخ</button>
-        </div>
-        <div class="json-summary" data-json-summary hidden></div>
+        {{CHATGPT_SECTION}}
       </div>
     </section>
 
