@@ -576,43 +576,6 @@
     }
   };
 
-  /* --------- Day Type Toggle (regular / writing / reflection) ---------
-     Reads default from body class (set by build_day.js from frontmatter);
-     localStorage overrides if user toggled previously. */
-  const DayTypeToggle = {
-    init() {
-      const buttons = $$('.day-type-btn');
-      if (!buttons.length) return;
-
-      const { week, day } = getLesson();
-      const fromStorage = (week && day && global.Storage) ? global.Storage.load(week, day, 'day_type') : null;
-      const fromBody = (document.body.className.match(/day-type-(regular|writing|reflection)/) || [])[1];
-      const initial = fromStorage || fromBody || 'regular';
-      this.apply(initial, /* persist */ false);
-
-      buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          this.apply(btn.dataset.dayType || 'regular', true);
-        });
-      });
-    },
-
-    apply(type, persist) {
-      const valid = ['regular', 'writing', 'reflection'];
-      const t = (valid.indexOf(type) === -1) ? 'regular' : type;
-      document.body.classList.remove('day-type-regular', 'day-type-writing', 'day-type-reflection');
-      document.body.classList.add('day-type-' + t);
-      $$('.day-type-btn').forEach(b => {
-        b.classList.toggle('active', b.dataset.dayType === t);
-      });
-      if (persist) {
-        const { week, day } = getLesson();
-        if (week && day && global.Storage) global.Storage.save(week, day, 'day_type', t);
-      }
-      ProgressBar.update();
-    }
-  };
-
   /* --------- Rating sliders (1-10) — load saved, update display, persist --- */
   const RatingSliders = {
     init() {
@@ -710,23 +673,90 @@
     }
   };
 
+  /* --------- Collapsible Sections — toggles `.section-toggle` aria-expanded;
+     bodies marked with `[aria-expanded="false"] ~ .section-body { display:none }`
+     in styles.css collapse automatically. Must run BEFORE ProgressBar.init so
+     `offsetParent` reflects the collapsed state when ProgressBar counts visible
+     checkboxes. */
+  const Collapsible = {
+    init() {
+      $$('.section-toggle').forEach(toggle => {
+        toggle.addEventListener('click', () => this.toggle(toggle));
+        toggle.addEventListener('keydown', (ev) => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            ev.preventDefault();
+            this.toggle(toggle);
+          }
+        });
+      });
+    },
+
+    toggle(toggle) {
+      const expanded = toggle.getAttribute('aria-expanded') !== 'false';
+      toggle.setAttribute('aria-expanded', String(!expanded));
+      // Recompute progress — offsetParent shifts when bodies collapse/expand.
+      if (typeof ProgressBar !== 'undefined' && ProgressBar.update) {
+        setTimeout(() => ProgressBar.update(), 50);
+      }
+    }
+  };
+
+  /* --------- Quick Export Top — header button mirrors the bottom export button. */
+  const QuickExport = {
+    init() {
+      const btn = $('#quickExportTop');
+      if (!btn) return;
+      btn.addEventListener('click', () => {
+        if (typeof Exporter !== 'undefined' && Exporter.copyMarkdown) {
+          Exporter.copyMarkdown();
+        } else {
+          const target = $('#sec-export');
+          if (target) target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+  };
+
+  /* --------- Scroll-To-Top FAB — appears after scrolling past `threshold` px. */
+  const ScrollTopFab = {
+    btn: null,
+    threshold: 400,
+
+    init() {
+      this.btn = $('#scrollTopBtn');
+      if (!this.btn) return;
+      this.btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      window.addEventListener('scroll', () => this.update(), { passive: true });
+      this.update();
+    },
+
+    update() {
+      if (!this.btn) return;
+      this.btn.hidden = !(window.scrollY > this.threshold);
+    }
+  };
+
   /* --------- Boot --------- */
   function boot() {
-    DayTypeToggle.init();   // must run first — controls visibility of writing-only sections
     AutoSaveFields.init();
     RatingSliders.init();
     WordCounter.init();
     MCQ.init();
     FillBlank.init();
     FreeWriting.init();
+    Collapsible.init();     // before ProgressBar so collapsed checkboxes are skipped
     Checkboxes.init();
     ProgressBar.init();
     SessionTimer.init();
     VoicePrompt.init();
     JSONValidator.init();
     Exporter.init();
+    QuickExport.init();     // depends on Exporter.copyMarkdown
     MintDeck.init();
     YouGlish.init();
+    ScrollTopFab.init();
 
     // Auto-save heartbeat (no-op callback — every module already saves on change,
     // but this keeps last_saved fresh for "current" status detection).
@@ -749,7 +779,8 @@
     MCQ, FillBlank, FreeWriting, Checkboxes, ProgressBar,
     SessionTimer, VoicePrompt, JSONValidator, Exporter,
     MintDeck, YouGlish, Toast,
-    DayTypeToggle, RatingSliders, AutoSaveFields, WordCounter,
+    Collapsible, QuickExport, ScrollTopFab,
+    RatingSliders, AutoSaveFields, WordCounter,
     getLesson
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -23,7 +23,9 @@ const { marked } = require('marked');
 const ROOT = path.join(__dirname, '..');
 
 const SECTION_IDS = [
-  'WHY', 'HOOK', 'GRAMMAR', 'GRAMMAR_EXERCISES',
+  'PODCAST_INSTRUCTIONS',
+  'WHY', 'HOOK',
+  'GRAMMAR', 'GRAMMAR_EXERCISES', 'GRAMMAR_MINI_REVIEW',
   'SPELLING', 'SPELLING_EXERCISES', 'READING',
   'PRONUNCIATION', 'CHATGPT', 'WRITING_GUIDE', 'MINTDECK'
 ];
@@ -652,22 +654,28 @@ function buildDay(weekArg, dayArg) {
     '{{READING_URL}}':      escapeHtml(resources.reading_url || '#'),
     '{{READING_TITLE}}':    escapeHtml(resources.reading_title || 'القراءة اليومية'),
 
-    '{{TIMER_PODCAST}}':    String(timers.podcast || 40),
-    '{{TIMER_CHATGPT}}':    String(timers.chatgpt || 25),
+    '{{TIMER_PODCAST}}':       String(timers.podcast || 40),
+    '{{TIMER_GRAMMAR}}':       String(timers.grammar || 25),
+    '{{TIMER_SPELLING}}':      String(timers.spelling || 15),
+    '{{TIMER_READING}}':       String(timers.reading || 15),
+    '{{TIMER_PRONUNCIATION}}': String(timers.pronunciation || 10),
+    '{{TIMER_CHATGPT}}':       String(timers.chatgpt || 25),
+    '{{TIMER_WRITING}}':       String(timers.writing || 15),
 
     '{{MINTDECK_TSV}}':     escapeHtml(data.mintdeck_tsv || ''),
 
     '{{SUCCESS_CRITERIA}}': buildSuccessChecklist(data.success_criteria),
 
+    '{{PODCAST_INSTRUCTIONS}}':       sectionsHtml.PODCAST_INSTRUCTIONS,
     '{{WHY_SECTION}}':                sectionsHtml.WHY,
     '{{HOOK_SECTION}}':               sectionsHtml.HOOK,
     '{{GRAMMAR_SECTION}}':            sectionsHtml.GRAMMAR,
     '{{GRAMMAR_EXERCISES_SECTION}}':  sectionsHtml.GRAMMAR_EXERCISES,
+    '{{GRAMMAR_MINI_REVIEW}}':        sectionsHtml.GRAMMAR_MINI_REVIEW,
     '{{SPELLING_SECTION}}':           sectionsHtml.SPELLING,
     '{{SPELLING_EXERCISES_SECTION}}': sectionsHtml.SPELLING_EXERCISES,
     '{{READING_SECTION}}':            sectionsHtml.READING,
     '{{PRONUNCIATION_SECTION}}':      sectionsHtml.PRONUNCIATION,
-    '{{CHATGPT_SECTION}}':            sectionsHtml.CHATGPT,
     '{{WRITING_GUIDE_SECTION}}':      sectionsHtml.WRITING_GUIDE,
     '{{MINTDECK_SECTION}}':           sectionsHtml.MINTDECK
   };

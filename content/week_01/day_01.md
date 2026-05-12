@@ -80,6 +80,23 @@ mintdeck_tsv: |
   enjoys	يستمتع	He enjoys long walks in the morning.	https://youglish.com/pronounce/enjoys/english/us
 ---
 
+## PODCAST_INSTRUCTIONS
+
+**كيف تستمع لـ ::{{podcast_title}}:: (40 دقيقة):**
+
+1. **الاستماع الأوّل (15 دقيقة) — للفهم العام:**
+   استمع وأنت تركّز على المعنى. لا توقف، لا قاموس.
+
+2. **الاستماع الثاني (15 دقيقة) — لاستخراج الـ ::3rd person:::**
+   كلّما سمعت ::he/she/it:: + فعل، انتبه: هل أضاف المتحدّث ::-s::؟
+
+3. **الاستماع الثالث (10 دقائق) — Shadowing:**
+   كرّر خلف المتحدّث 5 جمل تحتوي على ::3rd person + -s::.
+
+:::callout type="info"
+**هدف الاستماع:** اخرج بـ **5 كلمات/عبارات جديدة** و **3 جمل بصيغة ::3rd person::** تستطيع نطقها بنفس الإيقاع.
+:::
+
 ## WHY
 
 تخيّل هذا المشهد: أنت في مقابلة عمل في شركة تقنية. المدير ينظر إليك ويقول:
@@ -248,6 +265,17 @@ mintdeck_tsv: |
 :::callout type="warning"
 **قبل ما تكمل:** ارجع لجملك الثلاث. ضع دائرة حول كل فعل. هل في كل واحد منها **-s أو -es أو -ies**؟ لو في فعل بدون علامة — صحّحه الآن.
 :::
+
+## GRAMMAR_MINI_REVIEW
+
+:::fillblank id="gmr1"
+**Sentence:** My cousin _____ (try) a new restaurant every weekend.
+**Answer:** tries
+**Hint:** ساكن (::r::) قبل ::y:: → القاعدة 3
+**Rule:** ::try → tries:: (::3rd person:: + ساكن + ::y:: → ::-ies::)
+:::
+
+> لو أجبت ::tries:: بدون تردّد — أتقنت أهمّ قاعدتَين من اليوم: ::3rd person + -s:: و القاعدة الإملائية 3.
 
 ## SPELLING
 
