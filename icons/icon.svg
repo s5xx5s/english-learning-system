@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- placeholder app icon. replace icons/icon-192.png and
+       icons/icon-512.png with proper PNGs for iOS support. -->
+  <rect width="512" height="512" rx="96" fill="#1e40af"/>
+  <text x="256" y="296"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="220"
+        font-weight="700"
+        fill="#ffffff"
+        text-anchor="middle">EN</text>
+</svg>
