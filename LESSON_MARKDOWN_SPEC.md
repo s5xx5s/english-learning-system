@@ -107,6 +107,10 @@ mintdeck_tsv: |
 ### القائمة الإلزامية للأقسام:
 
 ````markdown
+## PODCAST
+[تعليمات الاستماع — مرّات الاستماع، الأسئلة، إلخ.
+يُحقَن داخل `{{PODCAST_INSTRUCTIONS}}` في القالب.]
+
 ## WHY
 [سيناريو افتتاحي - 3 فقرات]
 
@@ -118,6 +122,10 @@ mintdeck_tsv: |
 
 ## GRAMMAR_EXERCISES
 [MCQs + Fill-in-blank + Free writing]
+
+## GRAMMAR_MINI_REVIEW
+[جملة فيها فراغ + الإجابة المتوقّعة — للمراجعة بعد التمارين.
+يُحقَن داخل بطاقة `.mini-review` بعد قسم GRAMMAR_EXERCISES.]
 
 ## SPELLING
 [Spelling Spotlight - قواعد + جدول]
@@ -137,6 +145,10 @@ mintdeck_tsv: |
 ## MINTDECK
 [ملاحظات عن البطاقات]
 ````
+
+> **ملاحظة:** قسم `## CHATGPT` لم يَعُد مُستخدماً في القالب v2 —
+> الـ Voice Prompt يأتي مباشرةً من `voice_prompt` في الـ frontmatter.
+> يمكن إبقاء `## CHATGPT` في الـ MD كمرجع داخلي، لكنّ محتواه لن يُعرَض.
 
 ---
 

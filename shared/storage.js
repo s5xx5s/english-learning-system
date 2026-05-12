@@ -153,13 +153,18 @@
     },
 
     /**
-     * A day is "completed" if all 10 expected sections are checked.
-     * It is "current" if any field has been touched but not all sections checked.
-     * Otherwise "untouched".
+     * A day is "completed" when the count of checked sections reaches the
+     * threshold for its day_type. Template v2 introduced GRAMMAR_EXERCISES /
+     * SPELLING_EXERCISES / SELF_EDIT so the regular threshold rose from 10
+     * to 12; writing days add 3 extra (WORKSHOP, WEEKLY_PROJECT, SELF_EDIT)
+     * for a total of 15.
+     * "Current" = at least one field touched but threshold not yet met.
      */
     getDayStatus(week, day) {
       const sections = this.load(week, day, 'completed_sections');
-      if (Array.isArray(sections) && sections.length >= 10) return STATUS.COMPLETED;
+      const dayType = this.load(week, day, 'day_type') || 'regular';
+      const required = (dayType === 'writing') ? 15 : 12;
+      if (Array.isArray(sections) && sections.length >= required) return STATUS.COMPLETED;
 
       const touched = FIELDS.some(f => {
         if (f === 'last_saved') return false;

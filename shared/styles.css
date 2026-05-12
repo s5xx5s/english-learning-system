@@ -1067,7 +1067,82 @@ body.day-type-reflection .section[data-section="SPELLING_EXERCISES"] {
   color: var(--text-muted);
   text-align: end;
 }
+/* ─────────────────────────────────────────────────────────────────────
+   15b. JSON paste area — يظهر بعد voice prompt
+   <details> قابل للطيّ، يحوي textarea للصق JSON من ChatGPT
+   ───────────────────────────────────────────────────────────────────── */
+.json-paste-area {
+  margin-top: var(--space-4);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
 
+.json-paste-area > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--primary);
+  background: var(--bg-accent);
+  transition: background var(--transition);
+  list-style: none;
+  user-select: none;
+}
+
+.json-paste-area > summary::-webkit-details-marker { display: none; }
+
+.json-paste-area > summary::before {
+  content: "▸";
+  display: inline-block;
+  color: var(--primary);
+  font-size: 0.9rem;
+  transition: transform var(--transition);
+  flex-shrink: 0;
+}
+
+.json-paste-area[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.json-paste-area > summary:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.json-paste-area[open] > summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.json-paste-area > textarea {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+  margin: var(--space-3);
+  width: calc(100% - var(--space-6));
+  min-height: 180px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-secondary);
+}
+
+/* عرض ملخّص JSON بعد اللصق */
+.json-paste-area .json-summary {
+  margin: 0 var(--space-3) var(--space-3);
+  padding: var(--space-3);
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-sm);
+  color: #064e3b;
+  font-size: 0.9rem;
+}
+
+.json-paste-area .json-summary:not([hidden]) {
+  display: block;
+}
 /* 21. Responsive (tablet/desktop) ----------------------------------- */
 @media (min-width: 768px) {
   html { font-size: 17px; }
@@ -1095,4 +1170,512 @@ body.day-type-reflection .section[data-section="SPELLING_EXERCISES"] {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}/* =====================================================================
+   shared/styles.css — APPEND-ONLY PATCH
+   أضف هذا الجزء في نهاية styles.css الحالي.
+   لا يعدّل أيّ كلاس موجود — كلّ ما هنا فئات جديدة.
+   ===================================================================== */
+
+/* =====================================================================
+   23. Sticky Header v2 — يحلّ المشكلة 7 و 11
+   ===================================================================== */
+.header-sticky {
+  /* يرث من .header الموجود (sticky + blur + z-index: 100) */
+  box-shadow: var(--shadow-sm);
+}
+
+.header-sticky .header-inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+
+.header-meta {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.header-badge {
+  background: var(--bg-accent);
+  color: var(--text-secondary);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.header-badge strong { color: var(--text-primary); font-weight: 700; }
+.header-badge-muted { background: transparent; color: var(--text-muted); }
+
+.header-progress { min-width: 0; }
+
+.header-actions {
+  display: inline-flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.btn-quick-export {
+  background: var(--primary);
+  color: var(--bg-primary);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  min-height: 36px;
+  white-space: nowrap;
+  transition: background var(--transition);
+}
+.btn-quick-export:hover { background: var(--primary-dark); }
+
+/* في الشاشات الضيّقة، احذف الـ progress من الـ header لتفادي التزاحم */
+@media (max-width: 640px) {
+  .header-sticky .header-inner {
+    grid-template-columns: 1fr auto;
+    row-gap: var(--space-2);
+  }
+  .header-progress {
+    grid-column: 1 / -1;
+    order: 99;
+  }
+  .header-meta { font-size: 0.75rem; }
+  .header-badge-muted { display: none; }
+}
+
+/* =====================================================================
+   24. Lesson Intro Card + Table of Contents
+   ===================================================================== */
+.section-intro { background: var(--bg-primary); }
+
+.lesson-header {
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-4);
+}
+.lesson-date {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: var(--space-2);
+}
+.lesson-header h1 { margin-bottom: var(--space-3); }
+.lesson-goal {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* خريطة اليوم */
+.lesson-toc { unicode-bidi: plaintext; }
+.toc-title {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+  font-weight: 600;
+}
+.toc-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.toc-phase {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  border-inline-start: 3px solid var(--border);
+}
+.toc-phase-car  { border-color: #f59e0b; background: #fffbeb; }
+.toc-phase-home { border-color: var(--primary-light); background: var(--bg-accent); }
+.toc-phase-end  { border-color: var(--success); background: var(--success-bg); }
+
+.toc-phase-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  min-width: 110px;
+}
+.toc-phase a {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 2px var(--space-2);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  text-decoration: none;
+}
+.toc-phase a:hover { color: var(--primary); background: var(--bg-accent); text-decoration: none; }
+
+/* =====================================================================
+   25. Phase Dividers — 🚗 السيّارة / 🏠 البيت / ✅ الختام
+   يحلّ المشكلة 2 (الفصل البصري بين مراحل اليوم)
+   ===================================================================== */
+.phase-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  margin: var(--space-8) 0 var(--space-4);
+  border-radius: var(--radius-md);
+  position: relative;
+  unicode-bidi: plaintext;
+}
+.phase-divider::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+  opacity: 0.08;
+  pointer-events: none;
+}
+.phase-divider-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.phase-divider-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+.phase-divider-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+  flex: 1;
+}
+
+.phase-divider-car  { background: #fffbeb; border: 1px solid #fbbf24; }
+.phase-divider-home { background: var(--bg-accent); border: 1px solid var(--primary-light); }
+.phase-divider-end  { background: var(--success-bg); border: 1px solid var(--success); }
+
+@media (max-width: 600px) {
+  .phase-divider { padding: var(--space-3); flex-wrap: wrap; }
+  .phase-divider-subtitle { flex-basis: 100%; }
+}
+
+/* =====================================================================
+   26. Section enhancements — icons, timer badges, collapsibles
+   ===================================================================== */
+.section-icon {
+  display: inline-block;
+  margin-inline-end: var(--space-2);
+  font-size: 1.1em;
+}
+
+.section-timer-badge {
+  display: inline-block;
+  margin-inline-start: var(--space-2);
+  background: var(--bg-accent);
+  color: var(--primary);
+  padding: 2px var(--space-2);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  vertical-align: middle;
+  font-family: var(--font-mono);
+}
+
+/* زرّ التطيّ — يلفّ الـ <h2> */
+.section-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: transparent;
+  padding: 0;
+  text-align: start;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  flex: 1;
+  min-width: 0;
+}
+.section-toggle h2 { margin: 0; flex: 1; }
+.section-toggle::before {
+  content: '▾';
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  transition: transform var(--transition);
+  flex-shrink: 0;
+}
+.section-toggle[aria-expanded="false"]::before {
+  transform: rotate(-90deg);
+}
+.section-toggle[aria-expanded="false"] + .section-checkbox + .section-body,
+.section-toggle[aria-expanded="false"] ~ .section-body {
+  display: none;
+}
+
+/* قسم التمارين — يبرز بصرياً (Production > Recognition) */
+.section-exercises {
+  border-left: 4px solid var(--primary);
+  background: linear-gradient(to bottom, var(--bg-accent) 0%, var(--bg-primary) 60px);
+}
+html[dir="rtl"] .section-exercises {
+  border-left: none;
+  border-right: 4px solid var(--primary);
+}
+
+.exercises-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px dashed var(--border);
+}
+.exercises-badge {
+  display: inline-block;
+  padding: 2px var(--space-2);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+}
+.exercises-badge-mcq  { background: #ddd6fe; color: #5b21b6; }
+.exercises-badge-fill { background: #fde68a; color: #854d0e; }
+.exercises-badge-prod { background: #bbf7d0; color: #065f46; }
+
+.exercises-progress {
+  margin-inline-start: auto;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+/* Mini-Review block — القاعدة 9 من LESSON_FRAMEWORK */
+.mini-review {
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-top: var(--space-6);
+}
+.mini-review-title {
+  color: #78350f;
+  font-size: 1.05rem;
+  margin-bottom: var(--space-2);
+}
+.mini-review-prompt {
+  color: #92400e;
+  margin-bottom: var(--space-3);
+  font-size: 0.95rem;
+}
+
+/* قسم WHY / HOOK — تمييز بصري للسيناريو الافتتاحي والفخّ */
+.section-why { border-inline-start: 4px solid var(--primary-light); }
+.section-hook { border-inline-start: 4px solid var(--warning); background: linear-gradient(to bottom, #fffbeb 0%, var(--bg-primary) 80px); }
+
+/* القسم البارز (ChatGPT) — Voice محور أساسي */
+.section-highlight {
+  border: 2px solid var(--primary);
+  background: linear-gradient(to bottom, var(--bg-accent) 0%, var(--bg-primary) 100px);
+}
+
+.section-chatgpt h2 { color: var(--primary-dark); }
+
+/* =====================================================================
+   27. Voice Prompt Card v2 (يستبدل .voice-prompt القديم في القالب الجديد)
+   ===================================================================== */
+.voice-prompt-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--primary-light);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: var(--space-3);
+}
+.voice-prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--bg-accent);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.voice-prompt-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.voice-prompt-card pre.voice-prompt-text {
+  /* تعديل صغير على pre الموجودة — لون أفتح للقراءة المريحة */
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  font-size: 0.9rem;
+  padding: var(--space-3);
+}
+
+.btn-copy {
+  background: var(--bg-primary);
+  color: var(--primary);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--primary-light);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  min-height: 32px;
+  white-space: nowrap;
+}
+.btn-copy:hover { background: var(--primary); color: var(--bg-primary); border-color: var(--primary); }
+
+/* (legacy .json-paste-area rules moved to section 15b earlier in this file) */
+
+/* =====================================================================
+   28. Field groups + self-edit grid (لتحسين تنظيم النماذج)
+   ===================================================================== */
+.field-group + .field-group { margin-top: var(--space-4); }
+
+.self-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+@media (min-width: 768px) {
+  .self-edit-grid { grid-template-columns: 1fr 1fr; }
+  .self-edit-grid .field-group:nth-child(4) { grid-column: 1 / -1; }
+}
+
+/* =====================================================================
+   29. Reflection block (الأوقات + التقييم في كرت واحد)
+   ===================================================================== */
+.section-reflection .reflection-block + .reflection-block {
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border);
+}
+.reflection-block h3 {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-3);
+}
+
+/* =====================================================================
+   30. Export section + danger zone
+   ===================================================================== */
+.section-export {
+  background: var(--bg-accent);
+  border: 2px solid var(--primary-light);
+}
+
+.btn-large {
+  padding: var(--space-3) var(--space-6);
+  font-size: 1rem;
+  min-height: 48px;
+  font-weight: 600;
+}
+
+.export-danger-zone {
+  margin-top: var(--space-6);
+  padding-top: var(--space-4);
+  border-top: 1px dashed var(--border-strong);
+}
+
+.section-success { background: var(--success-bg); border-color: var(--success); }
+.section-success h2 { color: #064e3b; }
+
+/* =====================================================================
+   31. MintDeck TSV wrap (مع header + button)
+   ===================================================================== */
+.mintdeck-tsv-wrap { margin-top: var(--space-4); }
+.mintdeck-tsv-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+.mintdeck-tsv-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-secondary);
+}
+
+/* =====================================================================
+   32. Floating Action Button (FAB) — رجوع للأعلى
+   ===================================================================== */
+.fab-group {
+  position: fixed;
+  bottom: var(--space-6);
+  inset-inline-end: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 90;
+  pointer-events: none;
+}
+.fab {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--bg-primary);
+  font-size: 1.25rem;
+  font-weight: 700;
+  box-shadow: var(--shadow-lg);
+  pointer-events: auto;
+  transition: transform var(--transition), opacity var(--transition);
+}
+.fab:hover { background: var(--primary-dark); transform: scale(1.08); }
+.fab[hidden] { display: none; }
+
+/* =====================================================================
+   33. Podcast / Reading link wrappers — أبرز بصرياً
+   ===================================================================== */
+.podcast-link-wrap, .reading-link-wrap { margin-bottom: var(--space-3); }
+.podcast-link, .reading-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--bg-accent);
+  border: 1px solid var(--primary-light);
+  border-radius: var(--radius-sm);
+  color: var(--primary-dark);
+  font-weight: 500;
+  transition: background var(--transition);
+}
+.podcast-link:hover, .reading-link:hover {
+  background: var(--primary);
+  color: var(--bg-primary);
+  text-decoration: none;
+}
+.podcast-link-arrow, .reading-link-arrow {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* =====================================================================
+   34. Adjustments for tablet & up
+   ===================================================================== */
+@media (min-width: 768px) {
+  .section-toggle::before { font-size: 1rem; }
+  .header-actions { gap: var(--space-3); }
+  .btn-quick-export { padding: var(--space-2) var(--space-4); }
+}
+
+/* =====================================================================
+   35. Print styles — لمن يريد طباعة الدرس
+   ===================================================================== */
+@media print {
+  .header-sticky, .fab-group, .section-export,
+  .voice-prompt-card .btn-copy,
+  .btn-primary, .btn-secondary, .btn-tertiary, .btn-danger {
+    display: none !important;
+  }
+  .section, .phase-divider { break-inside: avoid; }
+  .section-toggle[aria-expanded="false"] ~ .section-body { display: block !important; }
 }
