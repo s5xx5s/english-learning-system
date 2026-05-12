@@ -19,3 +19,8 @@ desktop.ini
 # Temp
 *.tmp
 *.bak
+
+# Reference/scratch documents accidentally dropped into the project folder
+*.pdf
+*.docx
+*.xlsx
