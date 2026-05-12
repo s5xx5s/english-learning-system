@@ -185,6 +185,27 @@ pre code {
   color: var(--text-secondary);
 }
 
+/* ─────────────────────────────────────────────────────────────────────
+   4c. .en-inline-sentence — inline English sentence
+   Used when :::block::: appears INSIDE another element (a <p>, <button>,
+   <td>, <li>, ...). Same LTR isolation as `.en` but the wrapper element
+   already provides block layout, so this one stays inline.
+   ───────────────────────────────────────────────────────────────────── */
+.en-inline-sentence {
+  font-family: var(--font-en);
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* In table cells, give it a bit of structure (cells already align start
+   in our table CSS, but be explicit so the english sentence dominates
+   the cell). */
+td .en-inline-sentence,
+th .en-inline-sentence {
+  display: inline-block;
+  text-align: start;
+}
+
 /* 4c. Tables — LTR by default + cells use plaintext bidi ------------- */
 table {
   direction: ltr;

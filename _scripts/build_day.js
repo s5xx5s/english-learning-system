@@ -62,6 +62,44 @@ function escapeHtmlExceptMd(s) {
   return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
+/**
+ * Apply explicit English wrappers to a text fragment that is going to end
+ * up INSIDE another HTML element (a <p>, <button>, <td>, <li>, ...).
+ *
+ * Why this exists: transformBlockEnglish() uses /^...$/gm anchors, which
+ * only match at line boundaries. When :::block::: appears inside a custom
+ * block body (fillblank sentence, mcq option, callout, freewriting
+ * prompt), by the time transformBlockEnglish runs the surrounding content
+ * is already a single line of HTML, so the anchors never match and the
+ * raw `:::block:::` leaks through. transformInlineEnglish would then
+ * mis-eat two colons trying to interpret it as `::token::`.
+ *
+ * This helper runs BEFORE renderInline output is embedded so the wrapping
+ * happens at the right spot. It emits `.en-inline-sentence` (not
+ * `.en-block`) for :::block::: because the surrounding element is inline-
+ * level — block-level display would break the layout.
+ *
+ * Order matters: longer pattern first (`:::block:::`), then `::token::`.
+ */
+function processNestedEnglish(text) {
+  if (!text) return '';
+  let s = String(text);
+  s = s.replace(
+    /:::block\s+([\s\S]+?)\s*:::/g,
+    (_, content) =>
+      '<span class="en-inline-sentence">' + escapeHtml(content.trim()) + '</span>'
+  );
+  s = s.replace(
+    /::([^:\n]+?)::/g,
+    (match, content) => {
+      const trimmed = content.trim();
+      if (!trimmed) return match;
+      return '<span class="en">' + escapeHtml(trimmed) + '</span>';
+    }
+  );
+  return s;
+}
+
 /** Inline-only markdown: bold, italic, code, links. NOT block-level. */
 function renderInline(md) {
   if (!md) return '';
@@ -100,10 +138,22 @@ function parseAttrs(str) {
  * block-level and marked() never wraps it inside a `<p>`.
  */
 function transformBlockEnglish(text) {
-  return text.replace(
+  // Pass 1: stand-alone `:::block X:::` on its own line(s) → .en-block
+  //   (block-level: own padding, margin, background)
+  text = text.replace(
     /^:::block\s+([\s\S]+?)\s*:::$/gm,
     (_, content) => '\n\n<div class="en-block">' + escapeHtml(content.trim()) + '</div>\n\n'
   );
+  // Pass 2: any `:::block X:::` that survived Pass 1 — these are mid-line
+  // occurrences (e.g. inside a markdown table cell `| ... | :::block ...::: |`)
+  // that the line-anchored Pass 1 cannot reach. They render as inline
+  // `.en-inline-sentence` instead, which has no block-level layout so it
+  // doesn't break the surrounding cell / paragraph / list item.
+  text = text.replace(
+    /:::block\s+([\s\S]+?)\s*:::/g,
+    (_, content) => '<span class="en-inline-sentence">' + escapeHtml(content.trim()) + '</span>'
+  );
+  return text;
 }
 
 /**
@@ -255,8 +305,9 @@ function transformMCQ(md) {
     const options = [];
     lines.forEach(line => {
       const t = line.trim();
-      if (/^\*\*Q:\*\*/i.test(t)) {
-        question = t.replace(/^\*\*Q:\*\*\s*/i, '');
+      if (/^\*\*Q\d*:\*\*/i.test(t)) {
+        // Accept `**Q:**`, `**Q1:**`, `**Q2:**` ... (`\d*` = zero or more digits)
+        question = t.replace(/^\*\*Q\d*:\*\*\s*/i, '');
       } else if (/^\*\*Explanation:\*\*/i.test(t)) {
         explanation = t.replace(/^\*\*Explanation:\*\*\s*/i, '');
       } else if (/^-\s*\[[ xX]\]/.test(t)) {
@@ -268,16 +319,16 @@ function transformMCQ(md) {
 
     const opts = options.map(o =>
       '    <button type="button" class="mcq-option" data-correct="' + o.correct + '">' +
-      renderInline(escapeHtmlExceptMd(o.text)) + '</button>'
+      processNestedEnglish(renderInline(escapeHtmlExceptMd(o.text))) + '</button>'
     ).join('\n');
 
     const feedback = explanation
-      ? '\n  <div class="mcq-feedback" hidden>\n    <p><strong>Explanation:</strong> ' + renderInline(escapeHtmlExceptMd(explanation)) + '</p>\n  </div>'
+      ? '\n  <div class="mcq-feedback" hidden>\n    <p><strong>Explanation:</strong> ' + processNestedEnglish(renderInline(escapeHtmlExceptMd(explanation))) + '</p>\n  </div>'
       : '';
 
     return [
       '<div class="mcq-block" data-mcq-id="' + id + '">',
-      '  <p class="mcq-question"><strong>Q:</strong> ' + renderInline(escapeHtmlExceptMd(question)) + '</p>',
+      '  <p class="mcq-question"><strong>Q:</strong> ' + processNestedEnglish(renderInline(escapeHtmlExceptMd(question))) + '</p>',
       '  <div class="mcq-options">',
       opts,
       '  </div>' + feedback,
@@ -301,12 +352,14 @@ function transformFillBlank(md) {
 
     const inputHtml = '<input type="text" class="fillblank-input" data-answer="' +
       escapeHtml(answer.trim()) + '" placeholder="?" aria-label="املأ الفراغ">';
-    const sentenceHtml = renderInline(escapeHtmlExceptMd(sentence))
+    // processNestedEnglish runs BEFORE the _____ → input swap so the
+    // input tag isn't escaped by it.
+    const sentenceHtml = processNestedEnglish(renderInline(escapeHtmlExceptMd(sentence)))
       .replace(/_{3,}/, inputHtml);
 
     const feedbackParts = [];
-    if (hint) feedbackParts.push('    <p class="hint"><strong>Hint:</strong> ' + renderInline(escapeHtmlExceptMd(hint)) + '</p>');
-    if (rule) feedbackParts.push('    <p class="rule"><strong>Rule:</strong> ' + renderInline(escapeHtmlExceptMd(rule)) + '</p>');
+    if (hint) feedbackParts.push('    <p class="hint"><strong>Hint:</strong> ' + processNestedEnglish(renderInline(escapeHtmlExceptMd(hint))) + '</p>');
+    if (rule) feedbackParts.push('    <p class="rule"><strong>Rule:</strong> ' + processNestedEnglish(renderInline(escapeHtmlExceptMd(rule))) + '</p>');
     const feedback = feedbackParts.length
       ? '\n  <div class="fillblank-feedback" hidden>\n' + feedbackParts.join('\n') + '\n  </div>'
       : '';
@@ -337,13 +390,13 @@ function transformFreeWriting(md) {
 
     const reqHtml = requirements.length
       ? '  <ul class="fw-requirements">\n' +
-        requirements.map(r => '    <li>' + renderInline(escapeHtmlExceptMd(r)) + '</li>').join('\n') +
+        requirements.map(r => '    <li>' + processNestedEnglish(renderInline(escapeHtmlExceptMd(r))) + '</li>').join('\n') +
         '\n  </ul>'
       : '';
 
     return [
       '<div class="freewriting-block" data-fw-id="' + id + '">',
-      '  <p class="fw-prompt">' + renderInline(escapeHtmlExceptMd(prompt)) + '</p>',
+      '  <p class="fw-prompt">' + processNestedEnglish(renderInline(escapeHtmlExceptMd(prompt))) + '</p>',
       reqHtml,
       '  <textarea class="fw-input" data-min-words="' + minWords + '" placeholder="اكتب هنا..." aria-label="منطقة الكتابة الحرّة"></textarea>',
       '  <div class="fw-meta">',
@@ -444,7 +497,7 @@ function transformVoiceRecorder(md) {
 
     return [
       '<div class="voice-recorder-block" data-vr-id="' + id + '" data-word="' + word + '">',
-      '  <p class="vr-task">' + renderInline(escapeHtmlExceptMd(task)) + '</p>',
+      '  <p class="vr-task">' + processNestedEnglish(renderInline(escapeHtmlExceptMd(task))) + '</p>',
       '  <div class="vr-controls">',
       '    <div class="vr-row">',
       '      <button type="button" class="vr-record-before btn-secondary">تسجيل قبل</button>',
@@ -466,7 +519,10 @@ function transformCallouts(md) {
     const type = (attrs.type || 'info').toLowerCase();
     const allowed = ['warning', 'info', 'success', 'error'];
     const cls = 'callout-' + (allowed.indexOf(type) === -1 ? 'info' : type);
-    const innerHtml = renderInline(escapeHtmlExceptMd(inner));
+    // processNestedEnglish runs over the rendered text so :::block::: and
+    // ::token:: inside a callout body become spans rather than leaking
+    // through as literal `:::block X:::` text.
+    const innerHtml = processNestedEnglish(renderInline(escapeHtmlExceptMd(inner)));
     return '<div class="callout ' + cls + '"><p>' + innerHtml + '</p></div>';
   });
 }
