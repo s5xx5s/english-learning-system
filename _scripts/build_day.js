@@ -22,12 +22,16 @@ const { marked } = require('marked');
 
 const ROOT = path.join(__dirname, '..');
 
+// Section IDs the splitter recognises. Order is for readability only — the
+// splitter writes into a keyed object, so MD authors can reorder freely.
+// `CHATGPT` was retired in template v2; voice prompt now comes from
+// frontmatter (`voice_prompt` → `{{VOICE_PROMPT}}`).
 const SECTION_IDS = [
   'PODCAST',
   'WHY', 'HOOK',
   'GRAMMAR', 'GRAMMAR_EXERCISES', 'GRAMMAR_MINI_REVIEW',
   'SPELLING', 'SPELLING_EXERCISES', 'READING',
-  'PRONUNCIATION', 'CHATGPT', 'WRITING_GUIDE', 'MINTDECK'
+  'PRONUNCIATION', 'WRITING_GUIDE', 'MINTDECK'
 ];
 
 /* --------- tiny helpers --------- */
