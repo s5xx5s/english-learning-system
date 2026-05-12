@@ -120,7 +120,43 @@ pre {
   direction: ltr;
   margin-bottom: var(--space-4);
 }
-pre code { background: transparent; padding: 0; color: inherit; }
+pre code { background: transparent; padding: 0; color: inherit; direction: ltr; unicode-bidi: isolate; }
+
+/* 4b. Tables — LTR by default (most curriculum tables are English grammar),
+       individual cells use plaintext bidi so an Arabic-only cell still
+       renders right-to-left without manual annotation. ------------------ */
+table {
+  direction: ltr;
+  width: 100%;
+  border-collapse: collapse;
+  margin-block: var(--space-3);
+  font-size: 0.95rem;
+}
+th, td {
+  unicode-bidi: plaintext;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  text-align: start;
+  vertical-align: top;
+  line-height: 1.5;
+}
+th {
+  background: var(--bg-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+tbody tr:nth-child(even) td { background: rgba(241, 245, 249, 0.4); }
+
+/* 4c. Blockquotes — also need plaintext bidi for mixed-language content - */
+blockquote {
+  unicode-bidi: plaintext;
+  border-inline-start: 3px solid var(--primary-light);
+  padding: var(--space-2) var(--space-4);
+  margin-block: var(--space-3);
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+blockquote p { margin-bottom: 0; }
 
 /* 5. Layout ----------------------------------------------------------- */
 .container {
@@ -320,6 +356,10 @@ textarea { resize: vertical; min-height: 100px; font-family: inherit; line-heigh
 .callout-info    { background: var(--info-bg);    border-color: var(--info);    color: #075985; }
 .callout-success { background: var(--success-bg); border-color: var(--success); color: #064e3b; }
 .callout-error   { background: var(--error-bg);   border-color: var(--error);   color: #7f1d1d; }
+
+/* Adjacent callouts get a larger gap so they don't look glued together. */
+.callout + .callout { margin-top: var(--space-4); }
+.section-body > * + * { margin-top: var(--space-3); }
 
 /* 11. MCQ ------------------------------------------------------------- */
 .mcq-block {
@@ -621,6 +661,35 @@ textarea { resize: vertical; min-height: 100px; font-family: inherit; line-heigh
 .text-success { color: var(--success); }
 .text-error { color: var(--error); }
 .text-center { text-align: center; }
+
+/* Spacing utilities — replace ad-hoc inline styles. Steps follow the 4px scale. */
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: var(--space-1); }
+.mt-2 { margin-top: var(--space-2); }
+.mt-3 { margin-top: var(--space-3); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+
+/* Form-field label inside a section (used when a label sits outside .field-row) */
+.field-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Horizontal divider used between Grammar and its exercises, etc. */
+.section-divider {
+  margin-block: var(--space-6);
+  border: none;
+  border-top: 1px solid var(--border);
+}
 
 /* 20b. Dashboard (index.html) --------------------------------------- */
 .dashboard {

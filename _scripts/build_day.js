@@ -67,6 +67,111 @@ function parseAttrs(str) {
 }
 
 /* =====================================================================
+   Body-level frontmatter interpolation
+   Expands {{lowercase_field}} (and dotted paths like
+   {{resources.podcast_url}}) inside the MD body before marked() runs.
+   Missing fields are left untouched so the teacher sees the typo.
+   ===================================================================== */
+function interpolateFrontmatter(md, data) {
+  // First lookup: dotted path (resources.podcast_url).
+  // Fallback: search nested objects for the leaf name (reading_title finds
+  // resources.reading_title without forcing the teacher to type the path).
+  function lookup(key) {
+    if (key.indexOf('.') !== -1) {
+      const parts = key.split('.');
+      let v = data;
+      for (const p of parts) {
+        if (v === null || v === undefined || typeof v !== 'object') return undefined;
+        v = v[p];
+      }
+      return v;
+    }
+    if (data[key] !== undefined && typeof data[key] !== 'object') return data[key];
+    for (const k of Object.keys(data)) {
+      const child = data[k];
+      if (child && typeof child === 'object' && !Array.isArray(child)) {
+        if (child[key] !== undefined && typeof child[key] !== 'object') return child[key];
+      }
+    }
+    return undefined;
+  }
+
+  return md.replace(/\{\{([a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)*)\}\}/g, (m, key) => {
+    const v = lookup(key);
+    if (v === null || v === undefined) return m; // leave raw so typo is visible
+    // Trim trailing newline from YAML | block scalars (voice_prompt etc).
+    return String(v).replace(/\n+$/, '');
+  });
+}
+
+/* =====================================================================
+   Inline-English auto-wrapping (post-marked)
+   Wraps significant Latin-script runs inside <p>, <li>, and <blockquote>
+   with <bdi> tags. This isolates them from the surrounding RTL bidi
+   context so punctuation doesn't drift to the wrong end of the line.
+   Runs that are already inside <code>, <a>, <strong>, <em> are NOT
+   double-wrapped — they pass through.
+   ===================================================================== */
+function wrapInlineEnglish(html) {
+  // Wrap runs of Latin letters in <bdi> so RTL bidi doesn't reorder them.
+  // Two lookbehinds: \w prevents joining mid-word from previous text,
+  // & prevents matching the body of an HTML entity like &quot;Tell ...
+  const LATIN_RUN = /(?<![<\w&])([A-Za-z][A-Za-z0-9'’\-]+(?:[\s.,;:!?()][A-Za-z0-9'’\-]+){1,}[A-Za-z0-9.!?)])(?![\w>])/g;
+
+  // Replace HTML entities with private-use placeholders before wrapping,
+  // then restore them afterwards. This guarantees the regex never sees
+  // entity internals like "quot" "amp" "lt" "gt".
+  function maskEntities(text) {
+    const stash = [];
+    const masked = text.replace(/&(?:[a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/g, (m) => {
+      stash.push(m);
+      return '' + (stash.length - 1) + '';
+    });
+    return { masked, stash };
+  }
+  function unmaskEntities(text, stash) {
+    return text.replace(/(\d+)/g, (_, i) => stash[Number(i)]);
+  }
+
+  return html.replace(
+    /(<(p|li|blockquote)\b[^>]*>)([\s\S]*?)(<\/\2>)/g,
+    (full, openTag, _name, content, closeTag) => {
+      let out = '';
+      let i = 0;
+      while (i < content.length) {
+        const lt = content.indexOf('<', i);
+        const chunk = (lt === -1) ? content.slice(i) : content.slice(i, lt);
+        if (chunk.length) {
+          const { masked, stash } = maskEntities(chunk);
+          const wrapped = masked.replace(LATIN_RUN, '<bdi>$1</bdi>');
+          out += unmaskEntities(wrapped, stash);
+        }
+        if (lt === -1) break;
+
+        const gt = content.indexOf('>', lt);
+        if (gt === -1) { out += content.slice(lt); break; }
+        const tagName = (content.slice(lt + 1, gt).match(/^\/?(\w+)/) || [])[1] || '';
+        // For inline tags whose content shouldn't be re-wrapped, advance
+        // past the closing tag.
+        const skipContents = ['code', 'a', 'bdi'];
+        if (skipContents.indexOf(tagName.toLowerCase()) !== -1 && content[lt + 1] !== '/') {
+          const close = '</' + tagName + '>';
+          const ci = content.toLowerCase().indexOf(close.toLowerCase(), gt);
+          if (ci !== -1) {
+            out += content.slice(lt, ci + close.length);
+            i = ci + close.length;
+            continue;
+          }
+        }
+        out += content.slice(lt, gt + 1);
+        i = gt + 1;
+      }
+      return openTag + out + closeTag;
+    }
+  );
+}
+
+/* =====================================================================
    Custom block transformers
    ===================================================================== */
 
@@ -369,8 +474,12 @@ function buildDay(weekArg, dayArg) {
   const data = parsed.data;
   validateFrontmatter(data);
 
+  /* Expand {{lowercase_field}} from frontmatter inside the body BEFORE
+     custom blocks run — so a teacher can write {{voice_prompt}} or
+     {{resources.podcast_url}} anywhere in the lesson body. */
+  let body = interpolateFrontmatter(parsed.content, data);
+
   /* Transform custom blocks BEFORE marked */
-  let body = parsed.content;
   body = transformCallouts(body);
   body = transformMCQ(body);
   body = transformFillBlank(body);
@@ -378,12 +487,18 @@ function buildDay(weekArg, dayArg) {
   body = transformYouGlish(body);
   body = transformVoiceRecorder(body);
 
-  /* Split by section headers, then run marked() per section */
+  /* Split by section headers, then run marked() per section. After each
+     marked render, auto-wrap inline English in <bdi> for bidi safety. */
   const sections = splitIntoSections(body);
   marked.setOptions({ gfm: true, breaks: false });
   const sectionsHtml = {};
   SECTION_IDS.forEach(id => {
-    sectionsHtml[id] = sections[id] ? marked.parse(sections[id]) : '<p class="text-muted">(لا توجد محتوى لهذا القسم)</p>';
+    if (!sections[id]) {
+      sectionsHtml[id] = '<p class="text-muted">(لا توجد محتوى لهذا القسم)</p>';
+      return;
+    }
+    const rendered = marked.parse(sections[id]);
+    sectionsHtml[id] = wrapInlineEnglish(rendered);
   });
 
   /* Read template and replace placeholders */

@@ -43,9 +43,9 @@
   <main class="container main-content" role="main">
 
     <section class="section" aria-labelledby="lesson-title">
-      <h1 id="lesson-title" style="margin-bottom:8px">{{TITLE}}</h1>
-      <p style="margin-bottom:8px"><strong>الهدف:</strong> {{GOAL}}</p>
-      <p class="text-muted" style="margin-bottom:16px">{{DATE}} · {{DURATION_MINUTES}} دقيقة</p>
+      <h1 id="lesson-title" class="mb-2">{{TITLE}}</h1>
+      <p class="mb-2"><strong>الهدف:</strong> {{GOAL}}</p>
+      <p class="text-muted mb-4">{{DATE}} · {{DURATION_MINUTES}} دقيقة</p>
 
       <div class="day-type-toggle" role="radiogroup" aria-label="نوع اليوم">
         <button type="button" class="day-type-btn" data-day-type="regular" role="radio">
@@ -113,7 +113,7 @@
       <div class="section-body">
         {{GRAMMAR_SECTION}}
       </div>
-      <hr style="margin:24px 0;border:none;border-top:1px solid var(--border)">
+      <hr class="section-divider">
       <h3>تمارين القاعدة</h3>
       <div class="section-body">
         {{GRAMMAR_EXERCISES_SECTION}}
@@ -131,7 +131,7 @@
       <div class="section-body">
         {{SPELLING_SECTION}}
       </div>
-      <hr style="margin:24px 0;border:none;border-top:1px solid var(--border)">
+      <hr class="section-divider">
       <h3>تمارين Spelling</h3>
       <div class="section-body">
         {{SPELLING_EXERCISES_SECTION}}
@@ -154,8 +154,8 @@
       <div class="section-body">
         {{READING_SECTION}}
       </div>
-      <div class="reading-extras" style="margin-top:16px">
-        <label for="storyHardSpelling" style="display:block;margin-bottom:8px;font-weight:500">
+      <div class="reading-extras mt-4">
+        <label for="storyHardSpelling" class="field-label">
           3 كلمات بإملاء صعب من القصّة
         </label>
         <textarea id="storyHardSpelling"
@@ -190,19 +190,19 @@
       <p class="text-muted">المدّة المقترحة: {{TIMER_CHATGPT}} دقيقة. شغّل ChatGPT بوضع Voice Mode.</p>
 
       <div class="voice-prompt">
-        <h3 style="margin-bottom:8px">الـ Prompt للصق المباشر</h3>
+        <h3 class="mb-2">الـ Prompt للصق المباشر</h3>
         <pre class="voice-prompt-text">{{VOICE_PROMPT}}</pre>
         <button type="button" class="btn-primary" data-action="copy-voice-prompt" data-target=".voice-prompt-text">
           نسخ الـ Prompt
         </button>
       </div>
 
-      <h3 style="margin-top:24px;margin-bottom:8px">JSON من ChatGPT (بعد المحادثة)</h3>
-      <p class="text-muted" style="margin-bottom:8px">
+      <h3 class="mt-6 mb-2">JSON من ChatGPT (بعد المحادثة)</h3>
+      <p class="text-muted mb-2">
         اطلب من ChatGPT بنهاية المحادثة: <em>"give me the session feedback as JSON"</em>، ثم ألصِق هنا.
       </p>
       <textarea data-role="chatgpt-json" rows="6" placeholder='{"overall": ..., "fluency": ..., "errors": [...], "strengths": [...]}'></textarea>
-      <div style="margin-top:8px">
+      <div class="mt-2">
         <button type="button" class="btn-secondary" data-action="validate-chatgpt-json">
           تحقّق من صحّة JSON
         </button>
@@ -232,11 +232,11 @@
         </label>
       </div>
       <div class="section-body">
-        <label for="workshopTopic" style="display:block;margin-bottom:8px;font-weight:500">موضوع Workshop اليوم</label>
+        <label for="workshopTopic" class="field-label">موضوع Workshop اليوم</label>
         <input type="text" id="workshopTopic" data-field="workshop_topic"
                placeholder="مثال: Spelling 1 — قواعد -ed و -ing">
 
-        <label for="workshopExercise" style="display:block;margin-top:16px;margin-bottom:8px;font-weight:500">تمرين Workshop — الإجابات</label>
+        <label for="workshopExercise" class="field-label mt-4">تمرين Workshop — الإجابات</label>
         <textarea id="workshopExercise" data-field="workshop_exercise" rows="6"></textarea>
       </div>
     </section>
@@ -250,10 +250,10 @@
         </label>
       </div>
       <div class="section-body">
-        <label for="weeklyProjectTopic" style="display:block;margin-bottom:8px;font-weight:500">موضوع المشروع</label>
+        <label for="weeklyProjectTopic" class="field-label">موضوع المشروع</label>
         <input type="text" id="weeklyProjectTopic" data-field="weekly_project_topic">
 
-        <label for="weeklyProjectText" style="display:block;margin-top:16px;margin-bottom:8px;font-weight:500">النص الكامل</label>
+        <label for="weeklyProjectText" class="field-label mt-4">النص الكامل</label>
         <textarea id="weeklyProjectText" data-field="weekly_project_text" data-min-words="200" rows="10"></textarea>
         <div class="word-counter-wrap">
           <span class="word-counter" data-counter-for="weekly_project_text">0 كلمة</span>
@@ -266,16 +266,16 @@
         <h2 id="sec-selfedit">التصحيح الذاتي للمشروع</h2>
       </div>
       <div class="section-body">
-        <label for="selfEditSpelling" style="display:block;margin-bottom:8px;font-weight:500">أخطاء إملائيّة اكتشفتها بنفسك</label>
+        <label for="selfEditSpelling" class="field-label">أخطاء إملائيّة اكتشفتها بنفسك</label>
         <textarea id="selfEditSpelling" data-field="self_edit_spelling" rows="3"></textarea>
 
-        <label for="selfEditGrammar" style="display:block;margin-top:16px;margin-bottom:8px;font-weight:500">أخطاء قواعديّة اكتشفتها بنفسك</label>
+        <label for="selfEditGrammar" class="field-label mt-4">أخطاء قواعديّة اكتشفتها بنفسك</label>
         <textarea id="selfEditGrammar" data-field="self_edit_grammar" rows="3"></textarea>
 
-        <label for="selfEditPunctuation" style="display:block;margin-top:16px;margin-bottom:8px;font-weight:500">أخطاء ترقيم اكتشفتها</label>
+        <label for="selfEditPunctuation" class="field-label mt-4">أخطاء ترقيم اكتشفتها</label>
         <textarea id="selfEditPunctuation" data-field="self_edit_punctuation" rows="3"></textarea>
 
-        <label for="totalErrorsBefore" style="display:block;margin-top:16px;margin-bottom:8px;font-weight:500">عدد الأخطاء الإجمالي قبل التصحيح</label>
+        <label for="totalErrorsBefore" class="field-label mt-4">عدد الأخطاء الإجمالي قبل التصحيح</label>
         <input type="number" id="totalErrorsBefore" data-field="total_errors_before" min="0">
       </div>
     </section>
@@ -291,9 +291,9 @@
       <div class="section-body">
         {{MINTDECK_SECTION}}
       </div>
-      <h3 style="margin-top:16px;margin-bottom:8px">TSV للاستيراد المباشر</h3>
+      <h3 class="mt-4 mb-2">TSV للاستيراد المباشر</h3>
       <pre class="mintdeck-tsv">{{MINTDECK_TSV}}</pre>
-      <div style="margin-top:8px">
+      <div class="mt-2">
         <button type="button" class="btn-secondary" data-action="copy-mintdeck">
           نسخ TSV
         </button>
@@ -314,11 +314,11 @@
       <div class="section-body">
         <div class="grid-2">
           <div>
-            <label for="carMinutes" style="display:block;margin-bottom:8px;font-weight:500">السيّارة (دقيقة)</label>
+            <label for="carMinutes" class="field-label">السيّارة (دقيقة)</label>
             <input type="number" id="carMinutes" data-field="actual_car_minutes" min="0" max="180" placeholder="0">
           </div>
           <div>
-            <label for="homeMinutes" style="display:block;margin-bottom:8px;font-weight:500">البيت (دقيقة)</label>
+            <label for="homeMinutes" class="field-label">البيت (دقيقة)</label>
             <input type="number" id="homeMinutes" data-field="actual_home_minutes" min="0" max="300" placeholder="0">
           </div>
         </div>
@@ -352,7 +352,7 @@
 
     <section class="section" aria-labelledby="sec-export">
       <h2 id="sec-export">تصدير + إعادة ضبط</h2>
-      <p class="text-muted" style="margin-bottom:16px">
+      <p class="text-muted mb-4">
         التقرير اليومي يُجمَع تلقائياً من بياناتك المحفوظة. اختر صيغة:
       </p>
       <div class="export-actions">
@@ -366,7 +366,7 @@
           استيراد JSON
         </button>
       </div>
-      <div style="margin-top:24px">
+      <div class="mt-6">
         <button type="button" id="resetDay" class="btn-danger">
           مسح كل بيانات اليوم
         </button>
@@ -378,7 +378,7 @@
   <footer class="footer">
     <div class="container">
       <p>English Learning System — أسبوع {{WEEK_NUMBER}} / يوم {{DAY_NUMBER}}</p>
-      <p style="margin-top:4px"><a href="../../index.html">العودة للوحة التحكّم</a></p>
+      <p class="mt-1"><a href="../../index.html">العودة للوحة التحكّم</a></p>
     </div>
   </footer>
 
