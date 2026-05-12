@@ -16,7 +16,7 @@ const ROOT = path.join(__dirname, '..');
 const SECTION_IDS = [
   'WHY', 'HOOK', 'GRAMMAR', 'GRAMMAR_EXERCISES',
   'SPELLING', 'SPELLING_EXERCISES', 'READING',
-  'PRONUNCIATION', 'WRITING_GUIDE', 'MINTDECK'
+  'PRONUNCIATION', 'CHATGPT', 'WRITING_GUIDE', 'MINTDECK'
 ];
 
 /* --------- helpers --------- */
@@ -106,32 +106,35 @@ function interpolateFrontmatter(md, data) {
 
 /* =====================================================================
    Inline-English auto-wrapping (post-marked)
-   Wraps significant Latin-script runs inside <p>, <li>, and <blockquote>
-   with <bdi> tags. This isolates them from the surrounding RTL bidi
-   context so punctuation doesn't drift to the wrong end of the line.
-   Runs that are already inside <code>, <a>, <strong>, <em> are NOT
-   double-wrapped — they pass through.
+   Wraps English PHRASES (2+ words) inside <p>, <li>, and <blockquote>
+   with <span dir="ltr" class="en">. Phrase boundaries deliberately
+   include adjacent quote marks (ASCII " ' or HTML entities &quot;
+   &#39;) so they ride along with the LTR run, instead of drifting in
+   the surrounding RTL context.
+   Content already inside <code>, <a>, <span>, or <bdi> is passed
+   through untouched.
    ===================================================================== */
 function wrapInlineEnglish(html) {
-  // Wrap runs of Latin letters in <bdi> so RTL bidi doesn't reorder them.
-  // Two lookbehinds: \w prevents joining mid-word from previous text,
-  // & prevents matching the body of an HTML entity like &quot;Tell ...
-  const LATIN_RUN = /(?<![<\w&])([A-Za-z][A-Za-z0-9'’\-]+(?:[\s.,;:!?()][A-Za-z0-9'’\-]+){1,}[A-Za-z0-9.!?)])(?![\w>])/g;
+  // Quote alternatives — ASCII, curly, or HTML-encoded.
+  const QUOTE = '(?:&quot;|&#39;|["\'‘’“”])';
+  // Word separator: whitespace, common punctuation, dashes, or quote entity
+  // (so He said &quot;hi&quot; to me wraps as one run).
+  const SEP = '(?:\\s|[.,;:!?()\\-–—]|&(?:quot|#39);)';
+  // A word: letters / digits / internal apostrophe.
+  const WORD = '[A-Za-z0-9’\']+';
+  // Optional trailing punctuation so phrases can end at "manager." or "ready!".
+  const TAIL = '[A-Za-z0-9.!?,’)\\]]?';
 
-  // Replace HTML entities with private-use placeholders before wrapping,
-  // then restore them afterwards. This guarantees the regex never sees
-  // entity internals like "quot" "amp" "lt" "gt".
-  function maskEntities(text) {
-    const stash = [];
-    const masked = text.replace(/&(?:[a-zA-Z]+|#\d+|#x[0-9a-fA-F]+);/g, (m) => {
-      stash.push(m);
-      return '' + (stash.length - 1) + '';
-    });
-    return { masked, stash };
-  }
-  function unmaskEntities(text, stash) {
-    return text.replace(/(\d+)/g, (_, i) => stash[Number(i)]);
-  }
+  // Lookbehind: not preceded by < (inside tag) or word char (mid-word).
+  // & is intentionally NOT excluded — phrase may START at &quot;.
+  const PHRASE_RE = new RegExp(
+    '(?<![<\\w])(' + QUOTE + '?' +
+      '[A-Za-z][A-Za-z0-9’\'\\-]*' +
+      '(?:' + SEP + '+' + WORD + ')+' +
+      TAIL + QUOTE + '?' +
+    ')(?![\\w>])',
+    'g'
+  );
 
   return html.replace(
     /(<(p|li|blockquote)\b[^>]*>)([\s\S]*?)(<\/\2>)/g,
@@ -142,18 +145,15 @@ function wrapInlineEnglish(html) {
         const lt = content.indexOf('<', i);
         const chunk = (lt === -1) ? content.slice(i) : content.slice(i, lt);
         if (chunk.length) {
-          const { masked, stash } = maskEntities(chunk);
-          const wrapped = masked.replace(LATIN_RUN, '<bdi>$1</bdi>');
-          out += unmaskEntities(wrapped, stash);
+          out += chunk.replace(PHRASE_RE, '<span dir="ltr" class="en">$1</span>');
         }
         if (lt === -1) break;
 
         const gt = content.indexOf('>', lt);
         if (gt === -1) { out += content.slice(lt); break; }
         const tagName = (content.slice(lt + 1, gt).match(/^\/?(\w+)/) || [])[1] || '';
-        // For inline tags whose content shouldn't be re-wrapped, advance
-        // past the closing tag.
-        const skipContents = ['code', 'a', 'bdi'];
+        // Pass through content of these inline tags without re-wrapping.
+        const skipContents = ['code', 'a', 'bdi', 'span'];
         if (skipContents.indexOf(tagName.toLowerCase()) !== -1 && content[lt + 1] !== '/') {
           const close = '</' + tagName + '>';
           const ci = content.toLowerCase().indexOf(close.toLowerCase(), gt);
@@ -170,6 +170,7 @@ function wrapInlineEnglish(html) {
     }
   );
 }
+
 
 /* =====================================================================
    Custom block transformers
@@ -488,7 +489,8 @@ function buildDay(weekArg, dayArg) {
   body = transformVoiceRecorder(body);
 
   /* Split by section headers, then run marked() per section. After each
-     marked render, auto-wrap inline English in <bdi> for bidi safety. */
+     marked render, auto-wrap inline English in <span dir="ltr"> for
+     bidi safety. */
   const sections = splitIntoSections(body);
   marked.setOptions({ gfm: true, breaks: false });
   const sectionsHtml = {};
@@ -531,7 +533,6 @@ function buildDay(weekArg, dayArg) {
     '{{TIMER_PODCAST}}':    String(timers.podcast || 40),
     '{{TIMER_CHATGPT}}':    String(timers.chatgpt || 25),
 
-    '{{VOICE_PROMPT}}':     escapeHtml(data.voice_prompt || ''),
     '{{MINTDECK_TSV}}':     escapeHtml(data.mintdeck_tsv || ''),
 
     '{{SUCCESS_CRITERIA}}': buildSuccessChecklist(data.success_criteria),
@@ -544,6 +545,7 @@ function buildDay(weekArg, dayArg) {
     '{{SPELLING_EXERCISES_SECTION}}': sectionsHtml.SPELLING_EXERCISES,
     '{{READING_SECTION}}':            sectionsHtml.READING,
     '{{PRONUNCIATION_SECTION}}':      sectionsHtml.PRONUNCIATION,
+    '{{CHATGPT_SECTION}}':            sectionsHtml.CHATGPT,
     '{{WRITING_GUIDE_SECTION}}':      sectionsHtml.WRITING_GUIDE,
     '{{MINTDECK_SECTION}}':           sectionsHtml.MINTDECK
   };

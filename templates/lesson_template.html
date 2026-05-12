@@ -186,28 +186,9 @@
           <span>أنهيت</span>
         </label>
       </div>
-
-      <p class="text-muted">المدّة المقترحة: {{TIMER_CHATGPT}} دقيقة. شغّل ChatGPT بوضع Voice Mode.</p>
-
-      <div class="voice-prompt">
-        <h3 class="mb-2">الـ Prompt للصق المباشر</h3>
-        <pre class="voice-prompt-text">{{VOICE_PROMPT}}</pre>
-        <button type="button" class="btn-primary" data-action="copy-voice-prompt" data-target=".voice-prompt-text">
-          نسخ الـ Prompt
-        </button>
+      <div class="section-body">
+        {{CHATGPT_SECTION}}
       </div>
-
-      <h3 class="mt-6 mb-2">JSON من ChatGPT (بعد المحادثة)</h3>
-      <p class="text-muted mb-2">
-        اطلب من ChatGPT بنهاية المحادثة: <em>"give me the session feedback as JSON"</em>، ثم ألصِق هنا.
-      </p>
-      <textarea data-role="chatgpt-json" rows="6" placeholder='{"overall": ..., "fluency": ..., "errors": [...], "strengths": [...]}'></textarea>
-      <div class="mt-2">
-        <button type="button" class="btn-secondary" data-action="validate-chatgpt-json">
-          تحقّق من صحّة JSON
-        </button>
-      </div>
-      <div data-role="chatgpt-summary" class="json-summary" hidden></div>
     </section>
 
     <section class="section" data-section="WRITING" aria-labelledby="sec-writing">

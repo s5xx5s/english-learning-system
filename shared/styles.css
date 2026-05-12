@@ -100,6 +100,10 @@ li { margin-bottom: var(--space-1); }
   font-family: var(--font-en);
   unicode-bidi: isolate;
   direction: ltr;
+  /* inline-block keeps wrapped phrases as an atomic LTR run so adjacent
+     Arabic punctuation can't drift into them. */
+  display: inline-block;
+  max-width: 100%;
 }
 code, .mono {
   font-family: var(--font-mono);
