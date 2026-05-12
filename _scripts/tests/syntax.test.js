@@ -81,6 +81,49 @@ check('::-s/-es/-ies:: with slashes wraps correctly', () => {
     'expected <span class="en">-s/-es/-ies</span> in: ' + out);
 });
 
+/* 7. :::block ...::: inside :::fillblank::: becomes .en-inline-sentence,
+      input tag survives, and no raw `:::block` leaks --------------------- */
+check(':::block::: inside fillblank wraps as en-inline-sentence + keeps <input>', () => {
+  const md = [
+    ':::fillblank id="t7"',
+    '**Sentence:** :::block She _____ engineering. (study):::',
+    '**Answer:** studies',
+    ':::'
+  ].join('\n');
+  const out = processContent(md);
+  assert.ok(out.includes('en-inline-sentence'),  'no .en-inline-sentence in: ' + out);
+  assert.ok(out.includes('class="fillblank-input"'), 'no <input> in: ' + out);
+  assert.ok(!/:::?block/.test(out),               'leftover :::block in: ' + out);
+});
+
+/* 8. MCQ with **Q1:** prefix captures the question text ---------------- */
+check('MCQ accepts **Q1:** (digits after Q)', () => {
+  const md = [
+    ':::mcq id="t8"',
+    '**Q1:** Which is correct?',
+    '- [x] :::block He works.:::',
+    '- [ ] :::block He work.:::',
+    ':::'
+  ].join('\n');
+  const out = processContent(md);
+  assert.ok(/<p class="mcq-question"><strong>Q:<\/strong>\s+Which is correct/.test(out),
+    'MCQ question text missing in: ' + out);
+});
+
+/* 9. :::block::: inside a markdown table cell is inline, not block ---- */
+check(':::block::: inside a table cell renders inline (no <div class="en-block">)', () => {
+  const md = [
+    '| الاستخدام | مثال |',
+    '|---|---|',
+    '| روتين | :::block I work at Google.::: |'
+  ].join('\n');
+  const out = processContent(md);
+  assert.ok(/<td>[^<]*<span class="en-inline-sentence">I work at Google\.<\/span>/.test(out),
+    'expected inline span inside <td>, got: ' + out);
+  assert.ok(!out.includes('<div class="en-block">'),
+    'must NOT use block-level <div class="en-block"> inside a cell: ' + out);
+});
+
 /* --------------------------------------------------------------------- */
 console.log('\n' + passed + ' passed, ' + failed + ' failed');
 process.exit(failed === 0 ? 0 : 1);
