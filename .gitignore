@@ -15,6 +15,13 @@ desktop.ini
 # Local data
 *.local.json
 .env
+.env.local
+.env.*.local
+
+# Supabase secrets (service key, populated seed, generated configs)
+supabase/.temp/
+supabase/seed.sql
+assets/js/config.local.js
 
 # Temp
 *.tmp

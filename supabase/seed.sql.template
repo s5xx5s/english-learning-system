@@ -1,0 +1,54 @@
+-- ═══════════════════════════════════════════════════════════════════════════
+-- Seed template — copy to supabase/seed.sql (gitignored) before running.
+-- ═══════════════════════════════════════════════════════════════════════════
+-- This file is a TEMPLATE. Do not commit `supabase/seed.sql` after filling
+-- the values — it ends up in .gitignore.
+--
+-- Steps:
+--   1. Sign up in Supabase Auth UI (Authentication → Users → Add user).
+--      Save the email + password. Copy the new user's UID.
+--   2. Copy this file to `supabase/seed.sql`.
+--   3. Replace AUTH_UID_PLACEHOLDER and EMAIL_PLACEHOLDER below.
+--   4. Run it in the SQL Editor (with the service role, which seed scripts
+--      use by default in the SQL Editor).
+-- ═══════════════════════════════════════════════════════════════════════════
+
+INSERT INTO users (id, email, level, current_week, current_day, timezone)
+VALUES (
+  'AUTH_UID_PLACEHOLDER',           -- ← paste the UID from Auth → Users
+  'EMAIL_PLACEHOLDER',              -- ← your email
+  'B1',
+  1,
+  1,
+  'Asia/Riyadh'
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- Smoke-test the trigger right after seeding:
+--   1. Insert a fake error
+INSERT INTO errors (
+  user_id, error_type, wrong_form, correct_form, rule_violated,
+  context_sentence, source, occurrence_count
+)
+VALUES (
+  'AUTH_UID_PLACEHOLDER',
+  'grammar',
+  'He don''t like',
+  'He doesn''t like',
+  '3rd person singular: don''t → doesn''t',
+  'He don''t like coffee.',
+  'claude_manual',
+  1
+)
+RETURNING id;
+
+-- 2. Bump occurrence_count to 3 and confirm card_generated flips:
+--    UPDATE errors SET occurrence_count = 3 WHERE id = '<the-id>'
+--      RETURNING card_generated, card_id;
+--
+-- 3. Confirm the card exists:
+--    SELECT id, card_type, front, back FROM cards WHERE source_id = '<the-id>';
+--
+-- 4. Clean up:
+--    DELETE FROM cards  WHERE source_id  = '<the-id>';
+--    DELETE FROM errors WHERE id         = '<the-id>';
