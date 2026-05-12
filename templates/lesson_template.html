@@ -326,13 +326,14 @@
           <pre class="voice-prompt-text en">{{VOICE_PROMPT}}</pre>
         </div>
 
-        <details class="json-paste-area">
-          <summary>📊 الصق JSON من ChatGPT بعد المحادثة</summary>
+        <details class="json-paste-area" open>
+          <summary>📊 الصق JSON من ChatGPT بعد المحادثة الصوتية</summary>
           <textarea id="chatgptJson"
                     data-field="chatgpt_json"
                     rows="8"
-                    placeholder='{"date":"...","errors":[...],"overall_score":"X/10"}'
-                    spellcheck="false"></textarea>
+                    placeholder='{"date":"2026-05-12","day_number":1,"errors":[...],"overall_score":"X/10"}'
+                    spellcheck="false"
+                    dir="ltr"></textarea>
           <div class="json-summary" data-json-summary hidden></div>
         </details>
       </div>

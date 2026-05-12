@@ -1067,7 +1067,82 @@ body.day-type-reflection .section[data-section="SPELLING_EXERCISES"] {
   color: var(--text-muted);
   text-align: end;
 }
+/* ─────────────────────────────────────────────────────────────────────
+   15b. JSON paste area — يظهر بعد voice prompt
+   <details> قابل للطيّ، يحوي textarea للصق JSON من ChatGPT
+   ───────────────────────────────────────────────────────────────────── */
+.json-paste-area {
+  margin-top: var(--space-4);
+  background: var(--bg-primary);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
 
+.json-paste-area > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--primary);
+  background: var(--bg-accent);
+  transition: background var(--transition);
+  list-style: none;
+  user-select: none;
+}
+
+.json-paste-area > summary::-webkit-details-marker { display: none; }
+
+.json-paste-area > summary::before {
+  content: "▸";
+  display: inline-block;
+  color: var(--primary);
+  font-size: 0.9rem;
+  transition: transform var(--transition);
+  flex-shrink: 0;
+}
+
+.json-paste-area[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+.json-paste-area > summary:hover {
+  background: rgba(59, 130, 246, 0.15);
+}
+
+.json-paste-area[open] > summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.json-paste-area > textarea {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  direction: ltr;
+  unicode-bidi: isolate;
+  text-align: start;
+  margin: var(--space-3);
+  width: calc(100% - var(--space-6));
+  min-height: 180px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-secondary);
+}
+
+/* عرض ملخّص JSON بعد اللصق */
+.json-paste-area .json-summary {
+  margin: 0 var(--space-3) var(--space-3);
+  padding: var(--space-3);
+  background: var(--success-bg);
+  border: 1px solid var(--success);
+  border-radius: var(--radius-sm);
+  color: #064e3b;
+  font-size: 0.9rem;
+}
+
+.json-paste-area .json-summary:not([hidden]) {
+  display: block;
+}
 /* 21. Responsive (tablet/desktop) ----------------------------------- */
 @media (min-width: 768px) {
   html { font-size: 17px; }
@@ -1457,30 +1532,7 @@ html[dir="rtl"] .section-exercises {
 }
 .btn-copy:hover { background: var(--primary); color: var(--bg-primary); border-color: var(--primary); }
 
-/* منطقة لصق JSON من ChatGPT */
-.json-paste-area {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: var(--space-3);
-  margin-top: var(--space-3);
-}
-.json-paste-area summary {
-  cursor: pointer;
-  font-weight: 500;
-  color: var(--text-secondary);
-  user-select: none;
-  padding: var(--space-1) 0;
-}
-.json-paste-area summary:hover { color: var(--primary); }
-.json-paste-area[open] summary { margin-bottom: var(--space-3); color: var(--primary); }
-.json-paste-area textarea {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  direction: ltr;
-  unicode-bidi: isolate;
-  min-height: 120px;
-}
+/* (legacy .json-paste-area rules moved to section 15b earlier in this file) */
 
 /* =====================================================================
    28. Field groups + self-edit grid (لتحسين تنظيم النماذج)
